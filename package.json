@@ -1,0 +1,22 @@
+{
+  "name": "mco2_stadvdb_webapp",
+  "version": "1.0.0",
+  "description": "Webapp For MCO2 STADVDB",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RJ3L/mco2_stadvdb_webapp.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RJ3L/mco2_stadvdb_webapp/issues"
+  },
+  "homepage": "https://github.com/RJ3L/mco2_stadvdb_webapp#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
