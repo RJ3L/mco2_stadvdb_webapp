@@ -42,58 +42,28 @@
 
             </div>
         </section>
-        <section class="concurrency-frame">
-            <h3 class="concurrency-title">Concurrency Control and Consistency</h3>
-            <hr class="concurrency-divider">
-
-            <div class="concurrency-btn-1-box">
-                <div class="concurrency-btn-rect"></div>
-                <span class="concurrency-btn-text">Run Concurrency Test 1</span>
-            </div>
-
-            <div class="concurrency-btn-2-box">
-                <div class="concurrency-btn-rect"></div>
-                <span class="concurrency-btn-text">Run Concurrency Test 2</span>
-            </div>
-
-            <div class="concurrency-btn-3-box">
-                <div class="concurrency-btn-rect"></div>
-                <span class="concurrency-btn-text">Run Concurrency Test 3</span>
-            </div>
-        </section>
-
-        <section class="recovery-frame">
-            <h3 class="recovery-title">Global Failure Recovery</h3>
-            <hr class="recovery-divider">
-
-            <div class="recovery-btn-1-box">
-                <div class="recovery-btn-rect"></div>
-                <span class="recovery-btn-text">Run Recovery Test 1</span>
-            </div>
-
-            <div class="recovery-btn-2-box">
-                <div class="recovery-btn-rect"></div>
-                <span class="recovery-btn-text">Run Recovery Test 2</span>
-            </div>
-
-            <div class="recovery-btn-3-box">
-                <div class="recovery-btn-rect"></div>
-                <span class="recovery-btn-text">Run Recovery Test 3</span>
-            </div>
-
-            <div class="recovery-btn-4-box">
-                <div class="recovery-btn-rect"></div>
-                <span class="recovery-btn-text">Run Recovery Test 4</span>
-            </div>
-        </section>
-
-        <section class="terminal-frame">
-            <h3 class="terminal-title">Terminal</h3>
+        <section class="terminal-frame" style="left: 50px; top: 290px;">
+            <h3 class="terminal-header">Server 1</h3>
             <div class="terminal-screen">
-                <p class="terminal-text">[15:46:09] Connected...</p>
+                <iframe class="terminal-iframe" src="http://ccscloud.dlsu.edu.ph:60145" title="Server 0"></iframe>
+            </div>
+        </section>
+
+        <section class="terminal-frame" style="left: 650px; top: 290px;">
+            <h3 class="terminal-header">Server 2</h3>
+            <div class="terminal-screen">
+                <iframe class="terminal-iframe" src="http://ccscloud.dlsu.edu.ph:60146" title="Server 1"></iframe>
+            </div>
+        </section>
+
+        <section class="terminal-frame" style="left: 350px; top: 650px;">
+            <h3 class="terminal-header">Server 3</h3>
+            <div class="terminal-screen">
+                <iframe class="terminal-iframe" src="http://ccscloud.dlsu.edu.ph:60147" title="Server 2"></iframe>
             </div>
         </section>
 
         </div>
+    
 </body>
 </html>
