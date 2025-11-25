@@ -249,45 +249,236 @@ body {
     color: #000000;
 }
 
+.concurrency-frame {
+    position: absolute;
+    width: 387px;
+    height: 252px;
+    left: 12px;
+    top: 274px;
+    background: #FFFFFF;
+    box-shadow: inset 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 20px;
+}
+
+.concurrency-title {
+    position: absolute;
+    width: 288px;
+    height: 64px;
+    left: 50px; 
+    top: 0px;   
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 32px;
+    text-align: center;
+    color: #4D4D4D;
+    margin: 0;
+}
+
+.concurrency-divider {
+    position: absolute;
+    width: 387px;
+    height: 0px;
+    left: 0px; 
+    top: 64px;  
+    border: 1px solid #4D4D4D;
+    margin: 0;
+}
+
+.concurrency-btn-1-box {
+    position: absolute;
+    width: 367px;
+    height: 42px;
+    left: 10px; 
+    top: 84px; 
+}
+
+.concurrency-btn-2-box {
+    position: absolute;
+    width: 367px;
+    height: 42px;
+    left: 10px; 
+    top: 146px; 
+}
+
+.concurrency-btn-3-box {
+    position: absolute;
+    width: 367px;
+    height: 42px;
+    left: 10px; 
+    top: 208px; 
+}
+
+.concurrency-btn-rect {
+    position: absolute;
+    width: 367px;
+    height: 42px;
+    left: 0; 
+    top: 0;  
+    background: #367349;
+    border-radius: 20px;
+}
+
+.concurrency-btn-text {
+    position: absolute;
+    width: 264px;
+    height: 26px;
+    left: 52px;
+    top: 8px;  
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 26px;
+    text-align: center;
+    color: #FFFFFF;
+}
+
+.recovery-frame {
+    position: absolute;
+    width: 387px;
+    height: 293px;
+    left: 12px;
+    top: 539px;
+    background: #FFFFFF;
+    box-shadow: inset 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 20px;
+}
+
+.recovery-title {
+    position: absolute;
+    width: 367px;
+    height: 32px;
+    left: 10px; 
+    top: 11px;
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 32px;
+    text-align: center;
+    color: #4D4D4D;
+    margin: 0;
+}
+
+.recovery-divider {
+    position: absolute;
+    width: 387px;
+    height: 0px;
+    left: 0px; 
+    top: 54px;   
+    border: 1px solid #4D4D4D;
+    margin: 0;
+}
+
+.recovery-btn-1-box {
+    position: absolute;
+    width: 367px;
+    height: 42px;
+    left: 10px; 
+    top: 65px; 
+}
+
+.recovery-btn-2-box {
+    position: absolute;
+    width: 367px;
+    height: 42px;
+    left: 10px; 
+    top: 118px; 
+}
+
+.recovery-btn-3-box {
+    position: absolute;
+    width: 367px;
+    height: 42px;
+    left: 10px; 
+    top: 171px; 
+}
+
+.recovery-btn-4-box {
+    position: absolute;
+    width: 367px;
+    height: 42px;
+    left: 10px; 
+    top: 224px; 
+}
+
+.recovery-btn-rect {
+    position: absolute;
+    width: 367px;
+    height: 42px;
+    left: 0; 
+    top: 0;  
+    background: #367349;
+    border-radius: 20px;
+}
+
+.recovery-btn-text {
+    position: absolute;
+    width: 264px;
+    height: 26px;
+    left: 52px; 
+    top: 8px;  
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 26px;
+    text-align: center;
+    color: #FFFFFF;
+}
+
 .terminal-frame {
-        box-sizing: border-box;
-        position: absolute;
-        background: #FFFFFF;
-        border: 1px solid #4D4D4D;
-        border-radius: 20px;
-        /* Default Size for our 3 terminals */
-        width: 580px;
-        height: 340px;
-    }
+    box-sizing: border-box;
+    position: absolute;
+    width: 839px;
+    height: 531px;
+    left: 428px;
+    top: 284px;
+    background: #FFFFFF;
+    border: 1px solid #4D4D4D;
+    border-radius: 20px;
+}
 
-    .terminal-header {
-        position: absolute;
-        width: 100%;
-        height: 40px;
-        top: 10px;
-        text-align: center;
-        font-family: 'JetBrains Mono';
-        font-weight: 500;
-        font-size: 24px;
-        color: #367349;
-        margin: 0;
-    }
+.terminal-title {
+    position: absolute;
+    width: 173px;
+    height: 48px;
+    left: 33px; 
+    top: 13px;  
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 36px;
+    line-height: 48px;
+    text-align: center;
+    color: #367349;
+    margin: 0;
+}
 
-    .terminal-screen {
-        position: absolute;
-        width: 540px; /* Frame width - 40px padding */
-        height: 270px; /* Frame height - 70px padding */
-        left: 20px;
-        top: 55px;
-        background: #000000;
-        border-radius: 10px;
-        overflow: hidden;
-        border: 2px solid #333;
-    }
+.terminal-screen {
+    position: absolute;
+    width: 774px;
+    height: 429px;
+    left: 33px; 
+    top: 71px;  
+    background: #4D4D4D;
+    border-radius: 20px;
+}
 
-    .terminal-iframe {
-        width: 100%;
-        height: 100%;
-        border: none;
-        background-color: #ffffff;
-    }
+.terminal-text {
+    position: absolute;
+    width: 276px;
+    height: 26px;
+    left: 19px; 
+    top: 30px;  
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 26px;
+    text-align: center;
+    color: #FFFFFF;
+    margin: 0;
+}
