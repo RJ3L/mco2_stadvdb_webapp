@@ -3,6 +3,7 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const db = require("./models/db.js")
+const syncUtils = require("./models/sync.js")
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -22,13 +23,19 @@ async function testSelect(query, limit, from, to, node){
 /*
     Query: VALUES(...)
 */
-async function testInsert(query, startYear){
-    let res = await db.insertQuery(query, startYear)
+async function testInsert(query, startYear, node){
+    let res = await db.insertQuery(query, startYear, node)
     console.log("Result: " + res)
+}
+
+async function testMasterSync(){
+    let res = await syncUtils.syncMaster()
+    console.log(res)
 }
 app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
-    testSelect("WHERE tconst = 'test20045'", "", 2004, 2004, 1);
-    //let insertQuery = "VALUES ('test20045','movie','Movie Star','Movie Star',0,2004,NULL,120,'Action,Drama');"
-    //testInsert(insertQuery, 2004)
+    testSelect("WHERE tconst = 'testLogs'", "", 2004, 2004, 1);
+    //let insertQuery = "VALUES ('testLogs','movie','Movie Star','Movie Star',0,2004,NULL,120,'Action,Drama');"
+    //testInsert(insertQuery, 2004, 2)
+    //testMasterSync()
 })

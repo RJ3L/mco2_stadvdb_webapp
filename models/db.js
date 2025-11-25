@@ -11,7 +11,7 @@ const dbQueries = {
             return movies
         } else{
             // If toYear <= 2010, query from node 2
-            if (toYear <= 2010){
+            if (toYear <= 2010 || toYear == NULL){
                 // Check if available first
                 if (await nodeUtils.pingNode(2)){
                     console.log("DB Query: Select from Node 2")
@@ -65,11 +65,11 @@ const dbQueries = {
             }
         }
     },
-    insertQuery: async function (valuesQuery, startYear){
+    insertQuery: async function (valuesQuery, startYear, node){
         let baseQuery = "INSERT INTO "
         let tableQuery = " (tconst, titleType, primaryTitle, originalTitle, isAdult, startYear, endYear, runtimeMinutes, genres) "
         
-        if (await nodeUtils.pingNode(1)){
+        if (node == 1 && await nodeUtils.pingNode(1)){
             const { node2Alive, node3Alive } = await nodeUtils.pingAllNodes();
             const node2StatusFlag = node2Alive ? 1 : 0;
             const node3StatusFlag = node3Alive ? 1 : 0;
@@ -77,7 +77,7 @@ const dbQueries = {
             let query = `
                 SET @NODE_2_ALIVE = ${node2StatusFlag};
                 SET @NODE_3_ALIVE = ${node3StatusFlag};
-                SET @REPLICATOR_SYNC = 0;
+                SET @REPLICATOR_SYNC = 1;
                 START TRANSACTION;
                 ${baseQuery} node_1 ${tableQuery} ${valuesQuery}
                 COMMIT;
@@ -100,6 +100,9 @@ const dbQueries = {
         }
     },
     updateQuery: async function (){
+
+    },
+    deleteQuery: async function (query, year, node){
 
     }
 }
