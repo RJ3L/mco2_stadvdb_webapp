@@ -65,33 +65,42 @@ const dbQueries = {
             }
         }
     },
-
-    insertQuery: async function (valuesQuery, startYear, node){
+    insertQuery: async function (valuesQuery, startYear){
         let baseQuery = "INSERT INTO "
         let tableQuery = " (tconst, titleType, primaryTitle, originalTitle, isAdult, startYear, endYear, runtimeMinutes, genres) "
         
-        if (node == 1 && await nodeUtils.pingNode(1)){
-            let query = baseQuery + "node_1" + tableQuery + valuesQuery
+        if (await nodeUtils.pingNode(1)){
+            const { node2Alive, node3Alive } = await nodeUtils.pingAllNodes();
+            const node2StatusFlag = node2Alive ? 1 : 0;
+            const node3StatusFlag = node3Alive ? 1 : 0;
+
+            let query = `
+                SET @NODE_2_ALIVE = ${node2StatusFlag};
+                SET @NODE_3_ALIVE = ${node3StatusFlag};
+                SET @REPLICATOR_SYNC = 0;
+                START TRANSACTION;
+                ${baseQuery} node_1 ${tableQuery} ${valuesQuery}
+                COMMIT;
+            `
+            let result = await transactionUtils.doMultiTransaction(1, query)
             console.log("DB Query: Insert to Node 1")
-            await transactionUtils.doTransaction(node, query)
+            return result
+        } else if ((startYear <= 2010 || startYear == null) && await nodeUtils.pingNode(2)){
+            let query = baseQuery + "node_2" + tableQuery + valuesQuery
+            console.log("DB Query: Insert to Node 2")
+            let result = transactionUtils.doTransaction(2, query)
+            return result
+        } else if (startYear > 2010 && await nodeUtils.pingNode(3)){
+            let query = baseQuery + "node_3" + tableQuery + valuesQuery
+            console.log("DB Query: Insert to Node 3")
+            let result = await transactionUtils.doTransaction(3, query)
+            return result
         } else{
-            if (startYear <= 2010 || startYear == null){
-                // Insert to Node 2
-                let query = baseQuery + "node_2" + tableQuery + valuesQuery
-                console.log("DB Query: Insert to Node 2")
-                await transactionUtils.doTransaction(2, query)
-            } else if (startYear > 2010){
-                let query = baseQuery + "node_3" + tableQuery + valuesQuery
-                console.log("DB Query: Insert to Node 3")
-                await transactionUtils.doTransaction(3, query)
-            } else if (await nodeUtils.pingNode(1)){
-                let query = baseQuery + "node_1" + tableQuery + valuesQuery
-                console.log("DB Query: Insert to Node 1")
-                await transactionUtils.doTransaction(1, query)
-            } else{
-                console.log("DB Query: No nodes are available at this moment. Please try again later.")
-            }
+            console.log("DB Query: No nodes are available at this moment. Please try again later.")
         }
+    },
+    updateQuery: async function (){
+
     }
 }
 

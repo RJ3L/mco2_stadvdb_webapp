@@ -26,6 +26,26 @@ const transactionUtils = {
             }
         }
     },
+    doMultiTransaction: async function (node, query){
+        let connection
+        try{
+            connection = await nodeUtils.getConnection(node)
+            var [result, fields] = await connection.query({
+                sql: query,
+                multipleStatements: true
+            })
+            console.log("Transaction Completed")
+            return result
+        } catch(error){
+            if (connection){
+                await connection.rollback()
+            }
+        } finally{
+            if (connection){
+                await connection.release
+            }
+        }
+    },
     doDelayTransaction: async function (node, query){
         let connection
         try{
@@ -46,7 +66,7 @@ const transactionUtils = {
                 await connection.release()
             }
         }
-    }
+    },
 }
 
 module.exports = transactionUtils

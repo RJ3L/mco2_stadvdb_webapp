@@ -22,13 +22,13 @@ async function testSelect(query, limit, from, to, node){
 /*
     Query: VALUES(...)
 */
-async function testInsert(query, startYear, node){
-    let res = await db.insertQuery(query, startYear, node)
+async function testInsert(query, startYear){
+    let res = await db.insertQuery(query, startYear)
     console.log("Result: " + res)
 }
 app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
-    //testSelect("WHERE startYear = 2009", "", 2009, 2009, 2);
-    let insertQuery = "VALUES ('tt1234567','movie','Nicole is a Movie Star','Nicole is a Movie Star',0,2014,NULL,120,'Action,Drama');"
-    testInsert(insertQuery, 2014, 1)
+    testSelect("WHERE tconst = 'test20045'", "", 2004, 2004, 1);
+    //let insertQuery = "VALUES ('test20045','movie','Movie Star','Movie Star',0,2004,NULL,120,'Action,Drama');"
+    //testInsert(insertQuery, 2004)
 })

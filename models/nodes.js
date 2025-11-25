@@ -6,6 +6,7 @@ const baseConfig = {
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
     waitForConnections: true,
+    multipleStatements: true,
     connectionLimit: 10,
     maxIdle: 10, 
     idleTimeout: 60000, 
@@ -32,7 +33,7 @@ const node3 = mysql.createPool({
 const nodes = [node1, node2, node3];
 
 const nodeUtils = {
-    pingNode: async function (n) {
+    pingNode: async function (n){
         try {
             const [rows, fields] = await nodes[n - 1].query(`SELECT 1`);
             return true;
@@ -42,8 +43,15 @@ const nodeUtils = {
             return false;
         }
     },
-
-    getConnection: async function(n) {
+    pingAllNodes: async function (){
+        const node2Alive = await nodeUtils.pingNode(2);
+        const node3Alive = await nodeUtils.pingNode(3);
+        return {
+            node2Alive: node2Alive,
+            node3Alive: node3Alive
+        };
+    },
+    getConnection: async function(n){
         switch (n) {
             case 1: return await node1.getConnection();
             case 2: return await node2.getConnection();
