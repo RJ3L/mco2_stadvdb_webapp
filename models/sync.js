@@ -64,18 +64,18 @@ const syncUtils = {
                     bulkQueries += query
                 } else if (combinedLogs[i].action == "UPDATE"){
                     const query = `UPDATE node_1 SET 
-                        tconst = ` + combinedLogs[i].tconst + `
-                        titleType = ` + combinedLogs[i].titleType + `
-                        primaryTitle = ` + combinedLogs[i].primaryTitle + `
-                        originalTitle = ` + combinedLogs[i].originalTitle + `
-                        isAdult = ` + combinedLogs[i].isAdult + `
-                        startYear = ` + combinedLogs[i].startYear + `
-                        endYear = ` + combinedLogs[i].endYear + `
-                        runtimeMinutes = ` + combinedLogs[i].runtimeMinutes + `
-                        genres = ` + combinedLogs[i].genres
+                        titleType = '${log.titleType}',
+                        primaryTitle = '${log.primaryTitle}',
+                        originalTitle = '${log.originalTitle}',
+                        isAdult = ${log.isAdult},
+                        startYear = ${log.startYear},
+                        endYear = ${endYearValue},
+                        runtimeMinutes = ${log.runtimeMinutes},
+                        genres = '${log.genres}'
+                        WHERE tconst = '${log.tconst}';`
                     bulkQueries += query
                 } else if (combinedLogs[i].action == "DELETE"){
-                    const query = `DELETE FROM node_1 WHERE tconst = ` + combinedLogs[i].tconst
+                    const query = `DELETE FROM node_1 WHERE tconst = ${combinedLogs[i].tconst};` 
                     bulkQueries += query
                 }
             }
