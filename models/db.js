@@ -99,11 +99,81 @@ const dbQueries = {
             console.log("DB Query: No nodes are available at this moment. Please try again later.")
         }
     },
-    updateQuery: async function (){
-
+    updateQuery: async function (valuesQuery, tconst, year, node){
+        const headersArray = valuesQuery.split(',').map(item => item.trim());
+        let baseQuery = "UPDATE "
+        let tableQuery = " SET " + 
+            "titleType = '" + headersArray[0] + "', " + 
+            "primaryTitle = '" + headersArray[1] + "', " + 
+            "originalTitle = '" + headersArray[2] + "', " + 
+            "isAdult = '" + headersArray[3] + "', " + 
+            "startYear = '" + headersArray[4] + "', " + 
+            "endYear = '" + headersArray[5] + "', " + 
+            "runtimeMinutes = '" + headersArray[6] + "', " + 
+            "genres = '" + headersArray[7] + "' " + 
+            "WHERE tconst = '" + tconst + "';";
+        
+        if (node == 1 && await nodeUtils.pingNode(1)){
+            const { node2Alive, node3Alive } = await nodeUtils.pingAllNodes();
+            const node2StatusFlag = node2Alive ? 1 : 0;
+            const node3StatusFlag = node3Alive ? 1 : 0;
+            let updateQuery = `
+                SET @NODE_2_ALIVE = ${node2StatusFlag};
+                SET @NODE_3_ALIVE = ${node3StatusFlag};
+                SET @REPLICATOR_SYNC = 1;
+                START TRANSACTION;
+                ${baseQuery} node_1 ${tableQuery}
+                COMMIT;
+            `
+            let result = await transactionUtils.doMultiTransaction(node, updateQuery)
+            console.log("DB Query: Update to Node 1")
+            return result
+        } else if ((year <= 2010 || year == null) && await nodeUtils.pingNode(2)){
+            let updateQuery = baseQuery + "node_2" + tableQuery
+            console.log("DB Query: Update to Node 2")
+            let result = await transactionUtils.doTransaction(2, updateQuery)
+            return result
+        } else if (year > 2010 && await nodeUtils.pingNode(3)){
+            let updateQuery = baseQuery + "node_3" + tableQuery
+            console.log("DB Query: Update to Node 3")
+            let result = await transactionUtils.doTransaction(3, updateQuery)
+            return result
+        } else{
+            console.log("DB Query: No nodes are available at this moment. Please try again later.")
+        }  
     },
     deleteQuery: async function (query, year, node){
-
+        let baseQuery = "DELETE FROM "
+        let tableQuery = " WHERE tconst = '" + query + "';"
+        
+        if (node == 1 && await nodeUtils.pingNode(1)){
+            const { node2Alive, node3Alive } = await nodeUtils.pingAllNodes();
+            const node2StatusFlag = node2Alive ? 1 : 0;
+            const node3StatusFlag = node3Alive ? 1 : 0;
+            let deleteQuery = `
+                SET @NODE_2_ALIVE = ${node2StatusFlag};
+                SET @NODE_3_ALIVE = ${node3StatusFlag};
+                SET @REPLICATOR_SYNC = 1;
+                START TRANSACTION;
+                ${baseQuery} node_1 ${tableQuery}
+                COMMIT;
+            `
+            let result = await transactionUtils.doMultiTransaction(node, deleteQuery)
+            console.log("DB Query: Delete from Node 1")
+            return result
+        } else if ((year <= 2010 || year == null) && await nodeUtils.pingNode(2)){
+            let deleteQuery = baseQuery + "node_2" + tableQuery
+            console.log("DB Query: Delete from Node 2")
+            let result = await transactionUtils.doTransaction(2, deleteQuery)
+            return result
+        } else if (year > 2010 && await nodeUtils.pingNode(3)){
+            let deleteQuery = baseQuery + "node_3" + tableQuery
+            console.log("DB Query: Delete from Node 3")
+            let result = await transactionUtils.doTransaction(3, deleteQuery)
+            return result
+        } else{
+            console.log("DB Query: No nodes are available at this moment. Please try again later.")
+        }
     }
 }
 

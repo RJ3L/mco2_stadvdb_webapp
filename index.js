@@ -28,14 +28,27 @@ async function testInsert(query, startYear, node){
     console.log("Result: " + res)
 }
 
+async function testDelete(query, startYear, node){
+    let res = await db.deleteQuery(query, startYear, node)
+    console.log("Result: " + res)
+}
+
 async function testMasterSync(){
     let res = await syncUtils.syncMaster()
     console.log(res)
 }
+
+async function testUpdate(valuesQuery, tconst, year, node){
+    let res = await db.updateQuery(valuesQuery, tconst, year, node)
+    console.log("Result: " + res)
+}
 app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
-    testSelect("WHERE tconst = 'testLogs'", "", 2004, 2004, 1);
+    //testSelect("WHERE tconst = 'testLogs'", "", 2004, 2004, 1);
     //let insertQuery = "VALUES ('testLogs','movie','Movie Star','Movie Star',0,2004,NULL,120,'Action,Drama');"
     //testInsert(insertQuery, 2004, 2)
     //testMasterSync()
+    //testDelete("tt9698274", 2004, 1)
+    testUpdate("try, hi, hi, 1, 2004, 2010, 60, romance" , "ttTEST001", 2004, 1)
+    
 })

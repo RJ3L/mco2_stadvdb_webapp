@@ -37,6 +37,7 @@ const transactionUtils = {
             console.log("Transaction Completed")
             return result
         } catch(error){
+            console.log("Transaction Failed")
             if (connection){
                 await connection.rollback()
             }
