@@ -297,8 +297,6 @@ body {
     font-family: 'JetBrains Mono';
     font-size: 16px;
     color: #FFFFFF;
-    cursor: pointer;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25); 
 }
 
 .concurrency-button:hover {
@@ -349,7 +347,10 @@ body {
     font-family: 'JetBrains Mono';
     font-size: 16px;
     color: #FFFFFF;
-    cursor: pointer;
+}
+
+.recovery-button:hover {
+    background: #2a5838; 
 }
 
 .terminal-frame {
