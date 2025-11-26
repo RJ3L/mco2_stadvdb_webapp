@@ -23,42 +23,36 @@
                     <div class="node1-rectangle"></div>
                     <div class="node1-button-bg"></div>
                     <div class="node1-label">Node 1</div>
-                    <div class="node1-button">Button</div> 
+                    <div class="node1-button">Ping</div> 
                 </div>
                 
                 <div class="node2-box">
                     <div class="node2-rectangle"></div>
                     <div class="node2-button-bg"></div>
                     <div class="node2-label">Node 2</div>
-                    <div class="node2-button">Button</div> 
+                    <div class="node2-button">Ping</div> 
                 </div>
                 
                 <div class="node3-box">
                     <div class="node3-rectangle"></div>
                     <div class="node3-button-bg"></div>
                     <div class="node3-label">Node 3</div>
-                    <div class="node3-button">Button</div> 
+                    <div class="node3-button">Ping</div> 
                 </div>
 
             </div>
+        </section>
+            
+
         </section>
         <section class="concurrency-frame">
             <h3 class="concurrency-title">Concurrency Control and Consistency</h3>
             <hr class="concurrency-divider">
 
-            <div class="concurrency-btn-1-box">
-                <div class="concurrency-btn-rect"></div>
-                <span class="concurrency-btn-text">Run Concurrency Test 1</span>
-            </div>
-
-            <div class="concurrency-btn-2-box">
-                <div class="concurrency-btn-rect"></div>
-                <span class="concurrency-btn-text">Run Concurrency Test 2</span>
-            </div>
-
-            <div class="concurrency-btn-3-box">
-                <div class="concurrency-btn-rect"></div>
-                <span class="concurrency-btn-text">Run Concurrency Test 3</span>
+            <div class="concurrency-container">
+                <button class="concurrency-button">Run Concurrency Test 1</button>
+                <button class="concurrency-button">Run Concurrency Test 2</button>
+                <button class="concurrency-button">Run Concurrency Test 3</button>
             </div>
         </section>
 
@@ -66,32 +60,41 @@
             <h3 class="recovery-title">Global Failure Recovery</h3>
             <hr class="recovery-divider">
 
-            <div class="recovery-btn-1-box">
-                <div class="recovery-btn-rect"></div>
-                <span class="recovery-btn-text">Run Recovery Test 1</span>
-            </div>
+            <div class="recovery-container">
+                <button class="recovery-button">Run Recovery Test 1</button>
+                <button class="recovery-button">Run Recovery Test 2</button>
+                <button class="recovery-button">Run Recovery Test 3</button>
+                <button class="recovery-button">Run Recovery Test 4</button>
 
-            <div class="recovery-btn-2-box">
-                <div class="recovery-btn-rect"></div>
-                <span class="recovery-btn-text">Run Recovery Test 2</span>
-            </div>
-
-            <div class="recovery-btn-3-box">
-                <div class="recovery-btn-rect"></div>
-                <span class="recovery-btn-text">Run Recovery Test 3</span>
-            </div>
-
-            <div class="recovery-btn-4-box">
-                <div class="recovery-btn-rect"></div>
-                <span class="recovery-btn-text">Run Recovery Test 4</span>
             </div>
         </section>
 
         <section class="terminal-frame">
-            <h3 class="terminal-title">Terminal</h3>
-            <div class="terminal-screen">
-                <p class="terminal-text">[15:46:09] Connected...</p>
+            <h3 class="terminal-title">Database Management (CRUD Operations)</h3>
+            <div class ="crud-box">
+                <div class="crud-col">
+                    <h4>ADD ENTRY</h4>
+                    <input type="text" id="add_id" placeholder="ID"/>
+                    <input type="text" id="add_name" placeholder="Title"/>
+                    <input type="number" id="add_year" placeholder="Year"/>
+                    <input type="text" id="add_genre" placeholder="Genre"/>
+                    <button class="crud-button" onclick="handleInsert()">INSERT</button>
+                </div>
+
+                <div class="crud-col">
+                    <h4>UPDATE ENTRY</h4>
+                    <input type="text" id="update_id" placeholder="Target ID"/>
+                    <input type="text" id="update_name" placeholder="New Title"/>
+                    <input type="number" id="update_year" placeholder="New Year"/>
+                    <input type="text" id="update_genre" placeholder="New Genre"/>
+                    <button class="crud-button" onclick="handleUpdate()">UPDATE</button>
             </div>
+                <div class="crud-col">
+                    <h4>DELETE ENTRY</h4>
+                    <input type="text" id="delete_id" placeholder="Target ID"/>
+                    <button class="crud-button" onclick="handleDelete()">DELETE</button>
+                </div>
+        
         </section>
 
         </div>
