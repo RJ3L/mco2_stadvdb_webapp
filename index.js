@@ -5,10 +5,64 @@ const PORT = process.env.PORT || 3000;
 const db = require("./models/db.js")
 const syncUtils = require("./models/sync.js")
 
+app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
     res.send('Hello from the Node.js backend!');    
+});
+
+//Reference: https://expressjs.com/en/5x/api.html
+app.post('/api/select', async (req, res) => {
+    const {query, limit, fromYear, toYear, node} = req.body;
+
+    try {
+        console.log("Selecting Query...");
+        const result = await db.selectQuery(query, limit, parseInt(fromYear), parseInt(toYear), parseInt(node));
+        res.status(200).json({ message: 'Select successful', result: result }); //200 ok
+    } catch (error) {
+        res.status(500).json({ message: 'Select failed', error: error.message }); //400 bad request
+    }
+});
+
+app.post('/api/insert', async (req, res) => {
+    const {id, title, year, genre} = req.body;
+
+    //isAdult=0, runtime=120
+    const insertQuery = `VALUES ('${id}','movie','${title}','${title}',0,${year},NULL,120,'${genre}');`
+    try {
+        console.log("Inserting Query...");
+        const result = await db.insertQuery(insertQuery, parseInt(year), 1);
+        res.status(200).json({ message: 'Insert successful', result: result }); //200 ok
+    } catch (error) {
+        res.status(500).json({ message: 'Insert failed', error: error.message }); //400 bad request
+    }
+});
+
+app.post('/api/update', async (req, res) => {
+    const {id, title, year, genre} = req.body;
+
+    //isAdult=0, runtime=120
+    const updateQuery = `movie, ${title}, ${title}, 0, ${year}, NULL, 120, ${genre}`;
+    try {
+        console.log("Updating Query...");
+        const result = await db.updateQuery(updateQuery, id, parseInt(year), 1);
+        res.status(200).json({ message: 'Update successful', result: result }); //200 ok
+    } catch (error) {
+        res.status(500).json({ message: 'Update failed', error: error.message }); //400 bad request
+    }
+});
+
+app.post('/api/delete', async (req, res) => {
+    const {id, year} = req.body;
+
+    try {
+        console.log("Deleting Query...");
+        const result = await db.deleteQuery(id, parseInt(year), 1);
+        res.status(200).json({ message: 'Delete successful', result: result }); //200 ok
+    } catch (error) {
+        res.status(500).json({ message: 'Delete failed', error: error.message }); //400 bad request
+    }
 });
 
 /* 
