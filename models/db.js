@@ -77,7 +77,7 @@ const dbQueries = {
             let query = `
                 SET @NODE_2_ALIVE = ${node2StatusFlag};
                 SET @NODE_3_ALIVE = ${node3StatusFlag};
-                SET @REPLICATOR_SYNC = 1;
+                SET @REPLICATOR_SYNC = 0;
                 START TRANSACTION;
                 ${baseQuery} node_1 ${tableQuery} ${valuesQuery}
                 COMMIT;
@@ -113,14 +113,14 @@ const dbQueries = {
             "genres = '" + headersArray[7] + "' " + 
             "WHERE tconst = '" + tconst + "';";
         
-        if (node == 1 && await nodeUtils.pingNode(1)){
+        if (node ==1 && await nodeUtils.pingNode(1)){
             const { node2Alive, node3Alive } = await nodeUtils.pingAllNodes();
             const node2StatusFlag = node2Alive ? 1 : 0;
             const node3StatusFlag = node3Alive ? 1 : 0;
             let updateQuery = `
                 SET @NODE_2_ALIVE = ${node2StatusFlag};
                 SET @NODE_3_ALIVE = ${node3StatusFlag};
-                SET @REPLICATOR_SYNC = 1;
+                SET @REPLICATOR_SYNC = 0;
                 START TRANSACTION;
                 ${baseQuery} node_1 ${tableQuery}
                 COMMIT;
@@ -153,7 +153,7 @@ const dbQueries = {
             let deleteQuery = `
                 SET @NODE_2_ALIVE = ${node2StatusFlag};
                 SET @NODE_3_ALIVE = ${node3StatusFlag};
-                SET @REPLICATOR_SYNC = 1;
+                SET @REPLICATOR_SYNC = 0;
                 START TRANSACTION;
                 ${baseQuery} node_1 ${tableQuery}
                 COMMIT;
