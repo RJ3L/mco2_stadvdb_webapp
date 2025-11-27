@@ -5,10 +5,15 @@ const getValue = (id) => document.getElementById(id).value;
 //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify
 async function handleInsert(){
     const data = {
-       id: getValue('add_id'),
-       title: getValue('add_name'),
-       year: getValue('add_year'),
-       genre: getValue('add_genre') 
+       tconst: getValue('id'),
+       titleType: getValue('titleType'),
+       primaryTitle: getValue('PrimaryName'), 
+       originalTitle: getValue('OriginalName'), 
+       isAdult: getValue('Adult'), 
+       startYear: getValue('StartYear'), 
+       endYear: getValue('EndYear'), 
+       runtimeMinutes: getValue('RunTime'),
+       genres: getValue('genre'), 
     };
     
     try {
@@ -34,10 +39,15 @@ async function handleInsert(){
 
 async function handleUpdate(){
     const data = {
-       id: getValue('update_id'),
-       title: getValue('update_name'),
-       year: getValue('update_year'),
-       genre: getValue('update_genre') 
+       tconst: getValue('update_id'),
+       titleType: getValue('update_titleType'),
+       primaryTitle: getValue('update_PrimaryName'), 
+       originalTitle: getValue('update_OriginalName'), 
+       isAdult: getValue('update_Adult'), 
+       startYear: getValue('update_StartYear'), 
+       endYear: getValue('update_EndYear'), 
+       runtimeMinutes: getValue('update_RunTime'),
+       genres: getValue('update_Genre'), 
     };
 
     try {
@@ -48,7 +58,7 @@ async function handleUpdate(){
         });
         const result = await response.json();
         console.log(result);
-        alert("Update: " + result.message);
+        alert("Update: " + result.message + data);
     } catch (error) {
         console.error(error.message);
     }

@@ -26,13 +26,12 @@ app.post('/api/select', async (req, res) => {
 });
 
 app.post('/api/insert', async (req, res) => {
-    const {id, title, year, genre} = req.body;
+    const {tconst, titleType, primaryTitle, originalTitle, isAdult, startYear, endYear, runtimeMinutes, genres} = req.body;
+    const insertQuery = `VALUES (${tconst}, ${titleType}, ${primaryTitle}, ${originalTitle}, ${isAdult}, ${startYear}, ${endYear}, ${runtimeMinutes}, ${genres});`;
 
-    //isAdult=0, runtime=120
-    const insertQuery = `VALUES ('${id}','movie','${title}','${title}',0,${year},NULL,120,'${genre}');`
     try {
         console.log("Inserting Query...");
-        const result = await db.insertQuery(insertQuery, parseInt(year), 1);
+        const result = await db.insertQuery(insertQuery, parseInt(startYear), 1);
         res.status(200).json({ message: 'Insert successful', result: result }); //200 ok
     } catch (error) {
         res.status(500).json({ message: 'Insert failed', error: error.message }); //400 bad request
@@ -40,13 +39,12 @@ app.post('/api/insert', async (req, res) => {
 });
 
 app.post('/api/update', async (req, res) => {
-    const {id, title, year, genre} = req.body;
-
+    const {tconst, titleType, primaryTitle, originalTitle, isAdult, startYear, endYear, runtimeMinutes, genres} = req.body;
     //isAdult=0, runtime=120
-    const updateQuery = `movie, ${title}, ${title}, 0, ${year}, NULL, 120, ${genre}`;
+    const updateQuery = `${titleType}, ${primaryTitle}, ${originalTitle}, ${isAdult}, ${startYear}, ${endYear}, ${runtimeMinutes}, ${genres}`;
     try {
         console.log("Updating Query...");
-        const result = await db.updateQuery(updateQuery, id, parseInt(year), 1);
+        const result = await db.updateQuery(updateQuery, tconst, parseInt(startYear), 1);
         res.status(200).json({ message: 'Update successful', result: result }); //200 ok
     } catch (error) {
         res.status(500).json({ message: 'Update failed', error: error.message }); //400 bad request
@@ -102,10 +100,10 @@ async function testUpdate(valuesQuery, tconst, year, node){
 app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
     //testSelect("WHERE tconst = 'NODE2'", "", 2004, 2004, 2);
-    //let insertQuery = "VALUES ('NODE2','movie','Movie Star','Movie Star',0,2004,NULL,120,'Action,Drama');"
+    //let insertQuery = "VALUES ('NODE22','movie','Movie Star','Movie Star',0,2004,NULL,120,'Action,Drama');"
     //testInsert(insertQuery, 2004, 2)
     //testMasterSync()
     //testDelete("tt9698274", 2004, 1)
     //testUpdate("try, hi, hi, 1, 2004, 2010, 60, romance" , "ttTEST001", 2004, 1)
-    testFragSync(2)
+    //testFragSync(2)
 })

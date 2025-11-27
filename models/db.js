@@ -101,6 +101,7 @@ const dbQueries = {
     },
     updateQuery: async function (valuesQuery, tconst, year, node){
         const headersArray = valuesQuery.split(',').map(item => item.trim());
+        let genres = headersArray.slice(7).join(',');
         let baseQuery = "UPDATE "
         let tableQuery = " SET " + 
             "titleType = '" + headersArray[0] + "', " + 
@@ -110,7 +111,7 @@ const dbQueries = {
             "startYear = '" + headersArray[4] + "', " + 
             "endYear = '" + headersArray[5] + "', " + 
             "runtimeMinutes = '" + headersArray[6] + "', " + 
-            "genres = '" + headersArray[7] + "' " + 
+            "genres = '" + genres + "' " + 
             "WHERE tconst = '" + tconst + "';";
         
         if (node ==1 && await nodeUtils.pingNode(1)){

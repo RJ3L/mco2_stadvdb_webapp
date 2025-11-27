@@ -74,19 +74,29 @@
             <div class ="crud-box">
                 <div class="crud-col">
                     <h4>ADD ENTRY</h4>
-                    <input type="text" id="add_id" placeholder="ID"/>
-                    <input type="text" id="add_name" placeholder="Title"/>
-                    <input type="number" id="add_year" placeholder="Year"/>
-                    <input type="text" id="add_genre" placeholder="Genre"/>
+                    <input type="text" id="id" placeholder="tconst"/>
+                    <input type="text" id="titleType" placeholder="TitleType"/>
+                    <input type="text" id="PrimaryName" placeholder="PrimaryTitle"/>
+                    <input type="text" id="OriginalName" placeholder="OriginalTitle"/>
+                    <input type="text" id="Adult" placeholder="Adult (0 or 1)"/>
+                    <input type="number" id="StartYear" placeholder="startYear"/>
+                    <input type="number" id="EndYear" placeholder="endYear"/>
+                    <input type="number" id="RunTime" placeholder="runtimeMinutes"/>
+                    <input type="text" id="Genre" placeholder="Genre"/>
                     <button class="crud-button" onclick="handleInsert()">INSERT</button>
                 </div>
 
                 <div class="crud-col">
                     <h4>UPDATE ENTRY</h4>
-                    <input type="text" id="update_id" placeholder="Target ID"/>
-                    <input type="text" id="update_name" placeholder="New Title"/>
-                    <input type="number" id="update_year" placeholder="New Year"/>
-                    <input type="text" id="update_genre" placeholder="New Genre"/>
+                    <input type="text" id="update_id" placeholder="Target tconst"/>
+                    <input type="text" id="update_titleType" placeholder="New TitleType"/>
+                    <input type="text" id="update_PrimaryName" placeholder="New PrimaryTitle"/>
+                    <input type="text" id="update_OriginalName" placeholder="New OriginalTitle"/>
+                    <input type="text" id="update_Adult" placeholder="New Adult (0 or 1)"/>
+                    <input type="number" id="update_StartYear" placeholder="New startYear"/>
+                    <input type="number" id="update_EndYear" placeholder="New endYear"/>
+                    <input type="number" id="update_RunTime" placeholder="New runtimeMinutes"/>
+                    <input type="text" id="update_Genre" placeholder="New Genre"/>
                     <button class="crud-button" onclick="handleUpdate()">UPDATE</button>
             </div>
                 <div class="crud-col">
