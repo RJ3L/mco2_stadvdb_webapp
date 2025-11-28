@@ -8,6 +8,9 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchDatabaseData();
 });
 
+
+
+// Replace your existing fetchDatabaseData function with this fixed version
 async function fetchDatabaseData() {
     const tableBody = document.getElementById('database-body');
     if(!tableBody) return;
@@ -139,5 +142,24 @@ async function handleRead(){
         }
     } catch (error) {
         console.error(error.message);
+    }
+}
+
+async function checkNodeStatus(node){   
+    const element = document.getElementById(`node-${node}`);
+    try {
+        const response = await fetch(`/api/pingNode/${node}`);
+        const result = await response.json();
+        if (result.alive) {
+            element.textContent = `Reachable`;
+            element.style.color = 'green';
+        } else {
+            element.textContent = `Not Reachable`;
+            element.style.color = 'red';
+        }
+    } catch (error) {
+        console.error(`Error checking status of Node ${node}:`, error);
+        element.textContent = `Error checking Node ${node}`;
+        element.style.color = 'orange';
     }
 }
