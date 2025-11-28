@@ -1,36 +1,31 @@
 // Reference: https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById
-const getValue = (id) => document.getElementById(id).value;
+const getValue = (id) => {
+    const el = document.getElementById(id);
+    return el ? el.value : '';
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchDatabaseData();
 });
 
-// Replace your existing fetchDatabaseData function with this fixed version
 async function fetchDatabaseData() {
     const tableBody = document.getElementById('database-body');
     if(!tableBody) return;
 
     try {
         const response = await fetch('/api/database');
-        
-        if (!response.ok) {
-            throw new Error(`Server returned ${response.status}`);
-        }
-
         const data = await response.json();
-        tableBody.innerHTML = '';
 
-        // Handle if data is wrapped in a 'result' object or is an array
+        tableBody.innerHTML = '';
         const rows = Array.isArray(data) ? data : (data.result || []);
 
         if (rows.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No records found or Database Disconnected</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No records found</td></tr>';
             return;
         }
 
         rows.forEach(row => {
             const tr = document.createElement('tr');
-            // Fixed the missing </td> on the first line below
             tr.innerHTML = `
             <td>${row.tconst}</td> 
             <td>${row.titleType}</td>
@@ -38,6 +33,7 @@ async function fetchDatabaseData() {
             <td>${row.originalTitle}</td>
             <td>${row.isAdult}</td>
             <td>${row.startYear}</td>
+            <td>${row.endYear || 'N/A'}</td>
             <td>${row.runtimeMinutes}</td>
             <td>${row.genres}</td>
             `;
@@ -45,11 +41,9 @@ async function fetchDatabaseData() {
         });
     } catch (error) {
         console.error('Error fetching database data:', error.message);
-        tableBody.innerHTML = `<tr><td colspan="8" style="color:red; text-align:center;">Error: ${error.message}</td></tr>`;
     }
 }
-//References: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
-//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify
+
 async function handleInsert(){
     const data = {
        tconst: getValue('id'),
@@ -60,25 +54,18 @@ async function handleInsert(){
        startYear: getValue('StartYear'), 
        endYear: getValue('EndYear'), 
        runtimeMinutes: getValue('RunTime'),
-       genres: getValue('genre'), 
+       genres: getValue('Genre'), 
     };
     
     try {
-        /*Sample Syntax: const response = await fetch("https://example.org/post", {
-        method: "POST",
-        headers: {
-         "Content-Type": "application/json",
-         }, 
-         body: JSON.stringify({ username: "example" }),
-         */
         const response = await fetch('/api/insert', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
         });
         const result = await response.json();
-        console.log(result);
         alert("Insert: " + result.message);
+        fetchDatabaseData();
     } catch (error) {
         console.error(error.message);
     }
@@ -104,8 +91,8 @@ async function handleUpdate(){
             body: JSON.stringify(data),
         });
         const result = await response.json();
-        console.log(result);
-        alert("Update: " + result.message + data);
+        alert("Update: " + result.message);
+        fetchDatabaseData();
     } catch (error) {
         console.error(error.message);
     }
@@ -124,30 +111,33 @@ async function handleDelete(){
             body: JSON.stringify(data),
         });
         const result = await response.json();
-        console.log(result);
         alert("Delete: " + result.message);
+        fetchDatabaseData();
     } catch (error) {
         console.error(error.message);
     }
 }
 
-    async function handleRead(){
-        const data = {
-            id: getValue('read_id'),
-            year: getValue('read_year')
-        };
+async function handleRead(){
+    const data = {
+        id: getValue('read_id'),
+        year: getValue('read_year')
+    };
 
-        try {
-            const response = await fetch('/api/read', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
-            });
-            const result = await response.json();
-            console.log(result);
-            alert("Read: " + JSON.stringify(result.data));
-        } catch (error) {
+    try {
+        const response = await fetch('/api/read', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        });
+        const result = await response.json();
+        
+        if(result.result && result.result.length > 0){
+             alert("Record Found:\n" + JSON.stringify(result.result[0], null, 2));
+        } else {
+             alert("No record found (or Error): " + JSON.stringify(result));
+        }
+    } catch (error) {
         console.error(error.message);
     }
 }
-
