@@ -1,6 +1,54 @@
 // Reference: https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById
 const getValue = (id) => document.getElementById(id).value;
 
+document.addEventListener('DOMContentLoaded', () => {
+    fetchDatabaseData();
+});
+
+// Replace your existing fetchDatabaseData function with this fixed version
+async function fetchDatabaseData() {
+    const tableBody = document.getElementById('database-body');
+    if(!tableBody) return;
+
+    try {
+        const response = await fetch('/api/database');
+        
+        if (!response.ok) {
+            throw new Error(`Server returned ${response.status}`);
+        }
+
+        const data = await response.json();
+        tableBody.innerHTML = '';
+
+        // Handle if data is wrapped in a 'result' object or is an array
+        const rows = Array.isArray(data) ? data : (data.result || []);
+
+        if (rows.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No records found or Database Disconnected</td></tr>';
+            return;
+        }
+
+        rows.forEach(row => {
+            const tr = document.createElement('tr');
+            // Fixed the missing </td> on the first line below
+            tr.innerHTML = `
+            <td>${row.tconst}</td> 
+            <td>${row.titleType}</td>
+            <td>${row.primaryTitle}</td>
+            <td>${row.originalTitle}</td>
+            <td>${row.isAdult}</td>
+            <td>${row.startYear}</td>
+            <td>${row.endYear || '-'}</td>
+            <td>${row.runtimeMinutes}</td>
+            <td>${row.genres}</td>
+            `;
+            tableBody.appendChild(tr);
+        });
+    } catch (error) {
+        console.error('Error fetching database data:', error.message);
+        tableBody.innerHTML = `<tr><td colspan="8" style="color:red; text-align:center;">Error: ${error.message}</td></tr>`;
+    }
+}
 //References: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
 //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify
 async function handleInsert(){
@@ -82,6 +130,7 @@ async function handleDelete(){
     } catch (error) {
         console.error(error.message);
     }
+}
 
     async function handleRead(){
         const data = {
@@ -101,5 +150,5 @@ async function handleDelete(){
         } catch (error) {
         console.error(error.message);
     }
-    }
 }
+
