@@ -1,6 +1,7 @@
 const {node1, node2, node3, nodeUtils} = require('./nodes.js'); 
 const transactionUtils = require('./transactions.js'); 
 
+
 const syncUtils = {
     syncFragment: async function (nodeNum){
         console.log("Sync: Fragment")

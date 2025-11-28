@@ -4,6 +4,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const db = require("./models/db.js")
 const syncUtils = require("./models/sync.js")
+const {nodeUtils} = require('./models/nodes.js');
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -91,6 +92,29 @@ app.get('/api/database', async (req, res) => {
         console.error("Error fetching table data:", error);
         res.status(500).json({ error: error.message });
     }
+});
+
+app.get('/api/pingNode/:nodeNum', async (req, res) => {
+    const nodeNum = parseInt(req.params.nodeNum);
+    try {
+        console.log(`Pinging Node ${nodeNum}...`);
+        let isAlive = false;    
+        if (nodeNum === 1) {
+            isAlive = await nodeUtils.pingNode(1);
+        }
+        else if (nodeNum === 2) {
+            isAlive = await nodeUtils.pingNode(2);
+        }
+        else if (nodeNum === 3) {
+            isAlive = await nodeUtils.pingNode(3);
+        } else {
+            return res.status(400).json({ message: 'Invalid node number' });
+        }   
+        res.status(200).json({ node: nodeNum, alive: isAlive });
+    } catch (error) {
+        res.status(500).json({ message: 'Ping failed', error: error.message });
+    }
+
 });
 
 /* 
