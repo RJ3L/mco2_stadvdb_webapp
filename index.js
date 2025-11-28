@@ -76,6 +76,23 @@ app.post('/api/read', async (req, res) => {
 
 });
 
+app.get('/api/database', async (req, res) => {
+    try {
+        console.log("Fetching initial table data...");
+        
+        const result = await db.selectQuery("", "LIMIT 20", 1900, 2100, 1);
+        
+        if (result) {
+            res.status(200).json(result); 
+        } else {
+            res.status(200).json([]); 
+        }
+    } catch (error) {
+        console.error("Error fetching table data:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 /* 
     Query: WHERE = ...
     Limit: LIMIT ...
