@@ -63,6 +63,19 @@ app.post('/api/delete', async (req, res) => {
     }
 });
 
+app.post('/api/read', async (req, res) => {
+    const {id, year} = req.body;
+
+    try {
+        console.log("Reading Query...");
+        const result = await db.readQuery(id, parseInt(year), 1);
+        res.status(200).json({ message: 'Read successful', result: result }); //200 ok
+    } catch (error) {
+        res.status(500).json({ message: 'Read failed', error: error.message }); //400 bad request
+    }
+
+});
+
 /* 
     Query: WHERE = ...
     Limit: LIMIT ...
