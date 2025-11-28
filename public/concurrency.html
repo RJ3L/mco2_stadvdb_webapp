@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Concurrency Simulation</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="concurrency.css">
+  <script src="script.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="title-frame">
+             <h1 class="title">CONCURRENCY SIMULATION</h1>
+        </div>
+
+        <button class="back-button" onclick="window.location.href='index.html'">
+            &lt; Back To Dashboard
+        </button>
+
+        <div class="isolation-panel">
+            <h2 class="section-label">Select Isolation Level</h2>
+            <div class="isolation-container">
+                <select id="isolationLevel" class="isolation-dropdown">
+                    <option value="READ_UNCOMMITTED">Read Uncommitted</option>
+                    <option value="READ_COMMITTED">Read Committed</option>
+                    <option value="REPEATABLE_READ">Repeatable Read</option>
+                    <option value="SERIALIZABLE">Serializable</option>
+                </select>
+            </div>
+        </div>
+
+        <section class="terminal-frame">
+                <h3 class="terminal-title">Database Management (CRUD Operations)</h3>
+                <div class="crud-box">
+                    <div class="crud-col">
+                        <h4>READ ENTRY</h4>
+                        <input type="text" id="read_id" placeholder="Target tconst"/>
+                        <input type="number" id="read_year" placeholder="Target Year"/>
+                        <div class="spacer"></div>
+                        <button class="crud-button" onclick="handleRead()">READ</button>
+                    </div>
+
+                    <div class="crud-col">
+                        <h4>ADD ENTRY</h4>
+                        <input type="text" id="id" placeholder="tconst"/>
+                        <input type="text" id="titleType" placeholder="TitleType"/>
+                        <input type="text" id="PrimaryName" placeholder="PrimaryTitle"/>
+                        <input type="text" id="OriginalName" placeholder="OriginalTitle"/>
+                        <input type="text" id="Adult" placeholder="Adult (0 or 1)"/>
+                        <input type="number" id="StartYear" placeholder="startYear"/>
+                        <input type="number" id="EndYear" placeholder="endYear"/>
+                        <input type="number" id="RunTime" placeholder="runtimeMinutes"/>
+                        <input type="text" id="Genre" placeholder="Genre"/>
+                        <button class="crud-button" onclick="handleInsert()">INSERT</button>
+                    </div>
+
+                    <div class="crud-col">
+                        <h4>UPDATE ENTRY</h4>
+                        <input type="text" id="update_id" placeholder="Target tconst"/>
+                        <input type="text" id="update_titleType" placeholder="New TitleType"/>
+                        <input type="text" id="update_PrimaryName" placeholder="New PrimaryTitle"/>
+                        <input type="text" id="update_OriginalName" placeholder="New OriginalTitle"/>
+                        <input type="text" id="update_Adult" placeholder="New Adult (0 or 1)"/>
+                        <input type="number" id="update_StartYear" placeholder="New startYear"/>
+                        <input type="number" id="update_EndYear" placeholder="New endYear"/>
+                        <input type="number" id="update_RunTime" placeholder="New runtimeMinutes"/>
+                        <input type="text" id="update_Genre" placeholder="New Genre"/>
+                        <button class="crud-button" onclick="handleUpdate()">UPDATE</button>
+                    </div>
+
+                    <div class="crud-col">
+                        <h4>DELETE ENTRY</h4>
+                        <input type="text" id="delete_id" placeholder="Target ID"/>
+                        <input type="number" id="delete_year" placeholder="Target Year"/>
+                        <div class="spacer"></div>
+                        <button class="crud-button" onclick="handleDelete()">DELETE</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+   <section class="database-section">
+    <div class="database-row">
+        <h3 class="section-label" style="margin-bottom:0; border:none;">Live Database View</h3>
+        <button class="refresh-button" onclick="fetchTableData()">&#x21bb; Refresh Table</button>
+    </div>
+    
+    <!--Reference: https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/table-->
+    <div class="table-container">
+        <table class="database-table">
+            <thead>
+                <tr>
+                    <th>tconst</th>
+                    <th>titleType</th>
+                    <th>primaryTitle</th>
+                    <th>originalTitle</th>
+                    <th>isAdult</th>
+                    <th>startYear</th>
+                    <th>runtimeMinutes</th>
+                    <th>genres</th>
+                </tr>
+            </thead>
+            <tbody id="database-body">
+                </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>
