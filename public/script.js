@@ -82,4 +82,24 @@ async function handleDelete(){
     } catch (error) {
         console.error(error.message);
     }
+
+    async function handleRead(){
+        const data = {
+            id: getValue('read_id'),
+            year: getValue('read_year')
+        };
+
+        try {
+            const response = await fetch('/api/read', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+            const result = await response.json();
+            console.log(result);
+            alert("Read: " + JSON.stringify(result.data));
+        } catch (error) {
+        console.error(error.message);
+    }
+    }
 }
