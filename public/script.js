@@ -38,7 +38,6 @@ async function fetchDatabaseData() {
             <td>${row.originalTitle}</td>
             <td>${row.isAdult}</td>
             <td>${row.startYear}</td>
-            <td>${row.endYear || '-'}</td>
             <td>${row.runtimeMinutes}</td>
             <td>${row.genres}</td>
             `;
