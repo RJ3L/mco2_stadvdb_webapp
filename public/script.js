@@ -138,7 +138,7 @@ async function handleRead(){
         if(result.result && result.result.length > 0){
              alert("Record Found:\n" + JSON.stringify(result.result[0], null, 2));
         } else {
-             alert("No record found (or Error): " + JSON.stringify(result));
+             alert("No record found");
         }
     } catch (error) {
         console.error(error.message);
