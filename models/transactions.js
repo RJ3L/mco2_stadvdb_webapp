@@ -43,92 +43,90 @@ const transactionUtils = {
             }
         } finally{
             if (connection){
-                await connection.release()
+                await connection.release
             }
         }
     },
-    doTransactionWithIsolation: async function (node, query, isolationLevel = 'REPEATABLE READ') {
-        let connection
+    executeSelect: async function (node, query, isolationLevel) {
+        let connection;
         try {
-            connection = await nodeUtils.getConnection(node)
+            connection = await nodeUtils.getConnection(node);
             
-            // 1. Set the isolation level for this specific session
-            await connection.query(`SET SESSION TRANSACTION ISOLATION LEVEL ${isolationLevel}`)
-            
-            // 2. Begin
-            await connection.beginTransaction()
+            // 1. Set Isolation Level
+            if (isolationLevel) {
+                await connection.query(`SET SESSION TRANSACTION ISOLATION LEVEL ${isolationLevel}`);
+            }
 
-            // 3. Execute
-            var [result, fields] = await connection.query(query)
-            
-            // 4. Commit
-            await connection.commit()
-            return result
+            // 2. Start Transaction
+            await connection.beginTransaction();
+
+            // 3. Execute Query
+            const [rows, fields] = await connection.query(query);
+
+            // 4. Commit (End the transaction scope)
+            await connection.commit();
+            return rows;
         } catch (error) {
-            if (connection) await connection.rollback()
-            throw error
+            if (connection) await connection.rollback();
+            throw error;
         } finally {
-            if (connection) await connection.release()
+            if (connection) await connection.release();
         }
     },
+    executeUpdate: async function (node, query, isolationLevel, isDemoMode) {
+        let connection;
+        try {
+            connection = await nodeUtils.getConnection(node);
 
-    doSlowRead: async function (node, query, isolationLevel, delay = 10000){
+            // 1. Set Isolation Level
+            if (isolationLevel) {
+                await connection.query(`SET SESSION TRANSACTION ISOLATION LEVEL ${isolationLevel}`);
+                console.log(`[Tx] Isolation set to: ${isolationLevel}`);
+            }
+
+            // 2. Start Transaction
+            await connection.beginTransaction();
+
+            // 3. Execute Update
+            await connection.query(query);
+
+            // 4. THE DEMO DELAY (The Trap)
+            if (isDemoMode) {
+                console.log(`[Tx] Demo Mode: Sleeping for 10s to allow interference...`);
+                await sleep(10000); 
+            }
+
+            // 5. Commit
+            await connection.commit();
+            
+            console.log("[Tx] Update Transaction Completed");
+            return { affectedRows: 1, message: "Demo Update Complete" };
+
+        } catch (error) {
+            console.error("[Tx] Update Failed:", error.message);
+            if (connection) await connection.rollback();
+            throw error;
+        } finally {
+            if (connection) await connection.release();
+        }
+    },
+    doDelayTransaction: async function (node, query){
         let connection
         try{
             connection = await nodeUtils.getConnection(node)
-            // Set Isolation Level
-            await connection.query(`SET SESSION TRANSACTION ISOLATION LEVEL ${isolationLevel}`)
             await connection.beginTransaction()
-            
-            console.log(`   [Reader] Reading data (holding shared lock)...`)
-            const [rows] = await connection.query(query)
-            console.log(`   [Reader] Read Success. Sleeping for ${delay}ms...`)
-
-            // Sleep while holding the READ lock
-            await sleep(delay)
-            
-            await connection.commit()
-            console.log("   [Reader] Transaction Finished.")
-            return rows
-        } catch(error){
-            if (connection) await connection.rollback()
-            throw error
-        } finally{
-            if (connection) await connection.release()
-        }
-    },
-
-    doDelayTransaction: async function (node, query, delay = 10000) {
-        let connection
-        try {
-            connection = await nodeUtils.getConnection(node)
-            
-            // 1. Start the Transaction
-            await connection.beginTransaction()
-
-            console.log("   [Writer] Transaction Started. Updating data...")
-            
-            // 2. Execute the Query (e.g., UPDATE movie SET title = 'Dirty Data')
             var [result, fields] = await connection.query(query)
-            
-            // 3. Sleep to simulate a long process
-            // This holds the "Uncommitted" state so you can test it from another node
-            console.log(`   [Writer] Sleeping for ${delay}ms (holding lock)...`)
-            await sleep(delay) 
-            
-            // 4. Commit (Save changes)
+            await sleep(5000)
             await connection.commit()
-            console.log("   [Writer] Committed successfully.")
+            console.log("Transaction Completed")
             return result
-
-        } catch (error) {
-            console.log("   [Writer] Error! Rolling back.")
-            if (connection) {
-                await connection.rollback()
+        } catch(error){
+            if (connection){
+                await connection.rollback
             }
             throw error
-        } finally {
-            if (connection) {
+        } finally{
+            if (connection){
                 await connection.release()
             }
         }
