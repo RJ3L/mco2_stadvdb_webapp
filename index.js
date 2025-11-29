@@ -69,7 +69,9 @@ app.post('/api/delete', async (req, res) => {
 
 app.get('/api/database', async (req, res) => {
     try {
-        const result = await db.selectQuery("", "LIMIT 20", 1900, 2100, 1);
+        const result = await db.selectQuery("", "ORDER BY tconst ASC LIMIT 10", 1900, 2100, 1);
+        console.log("DB Result Preview:", result[0]);
+        
         if (result) {
             res.status(200).json(result); 
         } else {
