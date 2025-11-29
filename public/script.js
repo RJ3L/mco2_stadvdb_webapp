@@ -4,6 +4,17 @@ const getValue = (id) => {
     return el ? el.value : '';
 }
 
+// NEW: Helper to get Isolation Level and Demo Mode
+const getConcurrencySettings = () => {
+    const isoEl = document.getElementById('isolationLevel');
+    const demoEl = document.getElementById('demoMode');
+    
+    return {
+        isolationLevel: isoEl ? isoEl.value : 'READ COMMITTED', // Default
+        isDemoMode: demoEl ? demoEl.checked : false             // Default false
+    };
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     fetchDatabaseData();
 });
@@ -89,17 +100,28 @@ async function handleUpdate(){
        genres: getValue('update_Genre'), 
     };
 
+    const { isolationLevel, isDemoMode } = getConcurrencySettings();
+
+    const payload = {
+        ...data,
+        isolationLevel,
+        isDemoMode
+    };
+
+    console.log("Sending Update with:", payload);
+
     try {
         const response = await fetch('/api/update', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
+            body: JSON.stringify(payload),
         });
         const result = await response.json();
         alert("Update: " + result.message);
         fetchDatabaseData();
     } catch (error) {
         console.error(error.message);
+        alert("Update Failed");
     }
 } 
 
@@ -124,9 +146,11 @@ async function handleDelete(){
 }
 
 async function handleRead(){
+    const { isolationLevel } = getConcurrencySettings();
     const data = {
         id: getValue('read_id'),
-        year: getValue('read_year')
+        year: getValue('read_year'),
+        isolationLevel: isolationLevel // Send Isolation Level to Backend
     };
 
     try {
@@ -138,7 +162,7 @@ async function handleRead(){
         const result = await response.json();
         
         if(result.result && result.result.length > 0){
-             alert("Record Found:\n" + JSON.stringify(result.result[0], null, 2));
+             alert("Record Found (Isolation: " + isolationLevel + "):\n" + JSON.stringify(result.result[0], null, 2));
         } else {
              alert("No record found");
         }
