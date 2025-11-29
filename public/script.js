@@ -28,6 +28,8 @@ async function fetchDatabaseData() {
         }
 
         rows.forEach(row => {
+            if (!row.tconst) return;
+            
             const tr = document.createElement('tr');
             tr.innerHTML = `
             <td>${row.tconst}</td> 
