@@ -7,7 +7,7 @@ const dbQueries = {
         if (node == 1 && await nodeUtils.pingNode(1)){
             console.log("DB Query: Select from Node 1")
             const [movies, fields] = await node1
-                .query(`SELECT * FROM node_1 ` +  query + ` ORDER BY startYear ` + limit)
+                .query(`SELECT * FROM node_1 ` +  query + ` ` + limit)
             return movies
         } else{
             // If toYear <= 2010, query from node 2
@@ -16,12 +16,12 @@ const dbQueries = {
                 if (await nodeUtils.pingNode(2)){
                     console.log("DB Query: Select from Node 2")
                     const [movies, fields] = await node2
-                        .query(`SELECT * FROM node_2 ` +  query + ` ORDER BY startYear ` + limit)
+                        .query(`SELECT * FROM node_2 ` +  query + ` ` + limit)
                     return movies
                 } else if (await nodeUtils.pingNode(1)){
                     console.log("DB Query: Select from Node 1")
                     const [movies, fields] = await node1
-                        .query(`SELECT * FROM node_1 ` +  query + ` ORDER BY startYear ` + limit)
+                        .query(`SELECT * FROM node_1 ` +  query + ` ` + limit)
                     return movies
                 } else{
                     console.log("DB Query: No nodes are available at this moment. Please try again later.")
@@ -31,12 +31,12 @@ const dbQueries = {
                 if (await nodeUtils.pingNode(3)){
                     console.log("DB Query: Select from Node 3")
                     const [movies, fields] = await node3
-                        .query(`SELECT * FROM node_3 ` +  query + ` ORDER BY startYear ` + limit)
+                        .query(`SELECT * FROM node_3 ` +  query + ` ` + limit)
                     return movies
                 } else if (await nodeUtils.pingNode(1)){
                     console.log("DB Query: Select from Node 1")
                     const [movies, fields] = await node1
-                        .query(`SELECT * FROM node_1 ` +  query + ` ORDER BY startYear ` + limit)
+                        .query(`SELECT * FROM node_1 ` +  query + ` ` + limit)
                     return movies
                 } else{
                     console.log("DB Query: No nodes are available at this moment. Please try again later.")
@@ -46,16 +46,16 @@ const dbQueries = {
                 if (await nodeUtils.pingNode(1)){
                     console.log("DB Query: Select from Node 1")
                     const [movies, fields] = await node1
-                        .query(`SELECT * FROM node_1 ` +  query + ` ORDER BY startYear ` + limit)
+                        .query(`SELECT * FROM node_1 ` +  query + ` ` + limit)
                     return movies
                 } else {
                     // If Node 1 is down, query from both Nodes 2 and 3 
                     if (await nodeUtils.pingNode(2) && await nodeUtils.pingNode(3)){
                         console.log("DB Query: Select from both Nodes 2 and 3")
                         const [movies2, fields2] = await node2
-                            .query(`SELECT * FROM node_2 ` +  query + ` ORDER BY startYear`)
+                            .query(`SELECT * FROM node_2 ` +  query)
                         const [movies3, fields3] = await node3
-                            .query(`SELECT * FROM node_3 ` +  query + ` ORDER BY startYear`)
+                            .query(`SELECT * FROM node_3 ` +  query)
                         return movies2.concat(movies3)
                     } else{
                         // All nodes are down
