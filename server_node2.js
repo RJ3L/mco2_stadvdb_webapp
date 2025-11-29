@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 const db = require("./models/db.js")
 const syncUtils = require("./models/sync.js")
 
@@ -17,7 +17,7 @@ app.post('/api/select', async (req, res) => {
     const { query, limit, fromYear, toYear, node, isolationLevel } = req.body;
     try {
         console.log(`[Select] Node: ${node} | Isolation level: ${isolationLevel || 'Default'}`);
-        const result = await db.selectQuery(query, limit, parseInt(fromYear), parseInt(toYear), parseInt(node), 1, isolationLevel);
+        const result = await db.selectQuery(query, limit, parseInt(fromYear), parseInt(toYear), parseInt(node), 2, isolationLevel);
         res.status(200).json({ message: 'Select successful', result: result }); 
     } catch (error) {
         res.status(500).json({ message: 'Select failed', error: error.message }); 
@@ -34,8 +34,8 @@ app.post('/api/read', async (req, res) => {
         }
         // Use selectQuery to fetch data
         const yearInt = year ? parseInt(year) : null;
-        const result = await db.selectQuery(query, "LIMIT 1", yearInt, yearInt, 1, isolationLevel);
-        res.status(200).json({ message: 'Read successful', result: result });
+        const result = await db.selectQuery(query, "LIMIT 1", yearInt, yearInt, 2, isolationLevel);
+        res.status(200).json({ message: 'Read successful', result: result }); 
     } catch (error) {
         res.status(500).json({ message: 'Read failed', error: error.message }); 
     }
@@ -47,7 +47,7 @@ app.post('/api/insert', async (req, res) => {
 
     try {
         console.log("Inserting Query...");
-        const result = await db.insertQuery(insertQuery, parseInt(startYear), 1);
+        const result = await db.insertQuery(insertQuery, parseInt(startYear), 2);
         res.status(200).json({ message: 'Insert successful', result: result }); //200 ok
     } catch (error) {
         res.status(500).json({ message: 'Insert failed', error: error.message }); //400 bad request
@@ -78,7 +78,7 @@ app.post('/api/delete', async (req, res) => {
     const {id, year} = req.body;
     try {
         console.log(`[Delete] ${id}`);
-        const result = await db.deleteQuery(id, parseInt(year), 1);
+        const result = await db.deleteQuery(id, parseInt(year), 2);
         res.status(200).json({ message: 'Delete successful', result: result }); 
     } catch (error) {
         res.status(500).json({ message: 'Delete failed', error: error.message }); 
@@ -102,7 +102,7 @@ app.post('/api/sync', async (req, res) => {
 // FETCH TABLE DATA API
 app.get('/api/database', async (req, res) => {
     try {
-        const result = await db.selectQuery("", "LIMIT 20", 1900, 2100, 1);
+        const result = await db.selectQuery("", "LIMIT 20", 1900, 2100, 2);
         res.status(200).json(result || []); 
     } catch (error) {
         res.status(500).json({ error: error.message });
