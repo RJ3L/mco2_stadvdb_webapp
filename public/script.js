@@ -49,15 +49,15 @@ async function fetchDatabaseData() {
 
 async function handleInsert(){
     const data = {
-       tconst: getValue('id'),
-       titleType: getValue('titleType'),
-       primaryTitle: getValue('PrimaryName'), 
-       originalTitle: getValue('OriginalName'), 
-       isAdult: getValue('Adult'), 
-       startYear: getValue('StartYear'), 
-       endYear: getValue('EndYear'), 
-       runtimeMinutes: getValue('RunTime'),
-       genres: getValue('Genre'), 
+       tconst: getValue('insert_id'),
+       titleType: getValue('insert_TitleType'),
+       primaryTitle: getValue('insert_PrimaryName'), 
+       originalTitle: getValue('insert_OriginalName'), 
+       isAdult: getValue('insert_Adult'), 
+       startYear: getValue('insert_StartYear'), 
+       endYear: getValue('insert_EndYear'), 
+       runtimeMinutes: getValue('insert_RunTime'),
+       genres: getValue('insert_Genre'), 
     };
     
     try {

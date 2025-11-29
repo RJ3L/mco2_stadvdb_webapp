@@ -28,7 +28,7 @@ app.post('/api/select', async (req, res) => {
 
 app.post('/api/insert', async (req, res) => {
     const {tconst, titleType, primaryTitle, originalTitle, isAdult, startYear, endYear, runtimeMinutes, genres} = req.body;
-    const insertQuery = `VALUES (${tconst}, ${titleType}, ${primaryTitle}, ${originalTitle}, ${isAdult}, ${startYear}, ${endYear}, ${runtimeMinutes}, ${genres});`;
+    const insertQuery = `VALUES ('${tconst}', '${titleType}', '${primaryTitle}', '${originalTitle}', ${isAdult}, ${startYear}, ${endYear}, ${runtimeMinutes}, '${genres}');`;
 
     try {
         console.log("Inserting Query...");
