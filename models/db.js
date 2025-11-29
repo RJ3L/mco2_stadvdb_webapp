@@ -1,66 +1,50 @@
 const {node1, node2, node3, nodeUtils} = require('./nodes.js'); 
 const transactionUtils = require('./transactions.js'); 
+const syncUtils = require('./sync.js'); 
 
 const dbQueries = {
-    selectQuery: async function (query, limit, fromYear, toYear, node){
+    selectQuery: async function (query, limit, fromYear, toYear, node, isolationLevel = 'REPEATABLE READ'){
+        const runIsoQuery = async (targetNode, sql) => {
+            const conn = await nodeUtils.getConnection(targetNode);
+            try {
+                await conn.query(`SET SESSION TRANSACTION ISOLATION LEVEL ${isolationLevel}`);
+                const [rows] = await conn.query(sql);
+                return rows;
+            } finally {
+                conn.release();
+            }
+        };
+
+        let sql = `SELECT * FROM node_${node} ` + query + ` ORDER BY startYear ` + limit;
+        
         // Query from Node 1 Directly
         if (node == 1 && await nodeUtils.pingNode(1)){
-            console.log("DB Query: Select from Node 1")
-            const [movies, fields] = await node1
-                .query(`SELECT * FROM node_1 ` +  query + ` ` + limit)
-            return movies
-        } else{
-            // If toYear <= 2010, query from node 2
-            if (toYear <= 2010 || toYear == NULL){
-                // Check if available first
+            console.log(`DB Query: Select from Node 1 (${isolationLevel})`);
+            return await runIsoQuery(1, sql);
+        } else {
+            // Sharding Logic
+            if (toYear <= 2010 || toYear == null){
                 if (await nodeUtils.pingNode(2)){
-                    console.log("DB Query: Select from Node 2")
-                    const [movies, fields] = await node2
-                        .query(`SELECT * FROM node_2 ` +  query + ` ` + limit)
-                    return movies
+                    return await runIsoQuery(2, `SELECT * FROM node_2 ` + query + ` ORDER BY startYear ` + limit);
                 } else if (await nodeUtils.pingNode(1)){
-                    console.log("DB Query: Select from Node 1")
-                    const [movies, fields] = await node1
-                        .query(`SELECT * FROM node_1 ` +  query + ` ` + limit)
-                    return movies
-                } else{
-                    console.log("DB Query: No nodes are available at this moment. Please try again later.")
+                    return await runIsoQuery(1, `SELECT * FROM node_1 ` + query + ` ORDER BY startYear ` + limit);
                 }
             } else if (fromYear > 2010){
-                // Query from Node 3 if fromYear > 2010
                 if (await nodeUtils.pingNode(3)){
-                    console.log("DB Query: Select from Node 3")
-                    const [movies, fields] = await node3
-                        .query(`SELECT * FROM node_3 ` +  query + ` ` + limit)
-                    return movies
+                    return await runIsoQuery(3, `SELECT * FROM node_3 ` + query + ` ORDER BY startYear ` + limit);
                 } else if (await nodeUtils.pingNode(1)){
-                    console.log("DB Query: Select from Node 1")
-                    const [movies, fields] = await node1
-                        .query(`SELECT * FROM node_1 ` +  query + ` ` + limit)
-                    return movies
-                } else{
-                    console.log("DB Query: No nodes are available at this moment. Please try again later.")
+                    return await runIsoQuery(1, `SELECT * FROM node_1 ` + query + ` ORDER BY startYear ` + limit);
                 }
-            } else {
-                // Range spans both nodes
+            }
+             else {
+                // Range spans both nodes (Fallback to standard query for complex merge)
                 if (await nodeUtils.pingNode(1)){
-                    console.log("DB Query: Select from Node 1")
-                    const [movies, fields] = await node1
-                        .query(`SELECT * FROM node_1 ` +  query + ` ` + limit)
-                    return movies
-                } else {
-                    // If Node 1 is down, query from both Nodes 2 and 3 
-                    if (await nodeUtils.pingNode(2) && await nodeUtils.pingNode(3)){
-                        console.log("DB Query: Select from both Nodes 2 and 3")
-                        const [movies2, fields2] = await node2
-                            .query(`SELECT * FROM node_2 ` +  query)
-                        const [movies3, fields3] = await node3
-                            .query(`SELECT * FROM node_3 ` +  query)
-                        return movies2.concat(movies3)
-                    } else{
-                        // All nodes are down
-                        console.log("DB Query: No nodes are available at this moment. Please try again later.")
-                    }
+                    return await runIsoQuery(1, `SELECT * FROM node_1 ` + query + ` ORDER BY startYear ` + limit);
+                } else if (await nodeUtils.pingNode(2) && await nodeUtils.pingNode(3)){
+                    // Note: Transactions across multiple nodes are tricky, we just query normally here
+                    const [movies2] = await node2.query(`SELECT * FROM node_2 ` + query + ` ORDER BY startYear`);
+                    const [movies3] = await node3.query(`SELECT * FROM node_3 ` + query + ` ORDER BY startYear`);
+                    return movies2.concat(movies3);
                 }
             }
         }
@@ -99,7 +83,7 @@ const dbQueries = {
             console.log("DB Query: No nodes are available at this moment. Please try again later.")
         }
     },
-    updateQuery: async function (valuesQuery, tconst, year, node){
+    updateQuery: async function (valuesQuery, tconst, year, node, isolationLevel = 'REPEATABLE READ', simulateDelay = false){
         const headersArray = valuesQuery.split(',').map(item => item.trim());
         let genres = headersArray.slice(7).join(',');
         let baseQuery = "UPDATE "
@@ -113,35 +97,71 @@ const dbQueries = {
             "runtimeMinutes = '" + headersArray[6] + "', " + 
             "genres = '" + genres + "' " + 
             "WHERE tconst = '" + tconst + "';";
-        
-        if (node ==1 && await nodeUtils.pingNode(1)){
+
+            // NODE 1
+        if (node == 1 && await nodeUtils.pingNode(1)){
             const { node2Alive, node3Alive } = await nodeUtils.pingAllNodes();
             const node2StatusFlag = node2Alive ? 1 : 0;
             const node3StatusFlag = node3Alive ? 1 : 0;
-            let updateQuery = `
+
+            let setupSql = `
                 SET @NODE_2_ALIVE = ${node2StatusFlag};
                 SET @NODE_3_ALIVE = ${node3StatusFlag};
                 SET @REPLICATOR_SYNC = 0;
-                START TRANSACTION;
-                ${baseQuery} node_1 ${tableQuery}
-                COMMIT;
-            `
-            let result = await transactionUtils.doMultiTransaction(node, updateQuery)
-            console.log("DB Query: Update to Node 1")
-            return result
+            `;
+            let fullSql = `${baseQuery} node_1 ${tableQuery}`;
+
+            if (simulateDelay) {
+                console.log("DB Query: Update Node 1 (Simulating 5s Delay)");
+                let res = await transactionUtils.doDelayTransaction(1, setupSql + fullSql, 10000);
+                syncUtils.syncFragment(2)
+                syncUtils.syncFragment(3)
+                return res
+            } else {
+                console.log(`DB Query: Update Node 1 (${isolationLevel})`);
+                let res = await transactionUtils.doMultiTransaction(node, `START TRANSACTION; ${setupSql} ${fullSql} COMMIT;`);
+               
+                await syncUtils.syncFragment(2); 
+                await syncUtils.syncFragment(3);
+                
+                return res;
+            }
+
+        // NODE 2
         } else if ((year <= 2010 || year == null) && await nodeUtils.pingNode(2)){
-            let updateQuery = baseQuery + "node_2" + tableQuery
-            console.log("DB Query: Update to Node 2")
-            let result = await transactionUtils.doTransaction(2, updateQuery)
-            return result
+            let updateQuery = baseQuery + "node_2" + tableQuery;
+            
+            if (simulateDelay) {
+                console.log("DB Query: Update Node 2 (Simulating 5s Delay)");
+                let res = await transactionUtils.doDelayTransaction(2, updateQuery, 10000);
+                syncUtils.syncMaster()
+                return res
+            } else {
+                console.log(`DB Query: Update Node 2 (${isolationLevel})`);
+                let res = await transactionUtils.doTransactionWithIsolation(2, updateQuery, isolationLevel);
+                await syncUtils.syncMaster();     // 1. Push to Master
+                await syncUtils.syncFragment(2);
+                return res
+            }
+
+        // NODE 3
         } else if (year > 2010 && await nodeUtils.pingNode(3)){
-            let updateQuery = baseQuery + "node_3" + tableQuery
-            console.log("DB Query: Update to Node 3")
-            let result = await transactionUtils.doTransaction(3, updateQuery)
-            return result
-        } else{
-            console.log("DB Query: No nodes are available at this moment. Please try again later.")
-        }  
+            let updateQuery = baseQuery + "node_3" + tableQuery;
+            if (simulateDelay) {
+                console.log("DB Query: Update Node 3 (Simulating 5s Delay)");
+                let res = await transactionUtils.doDelayTransaction(3, updateQuery, 10000);
+                syncUtils.syncMaster()
+                return res
+            } else {
+                console.log(`DB Query: Update Node 3 (${isolationLevel})`);
+                let res = await transactionUtils.doTransactionWithIsolation(3, updateQuery, isolationLevel);
+                await syncUtils.syncMaster();
+                await syncUtils.syncFragment(3);
+                return res
+            }
+        } else {
+            console.log("DB Query: No nodes are available.")
+        }
     },
     deleteQuery: async function (query, year, node){
         let baseQuery = "DELETE FROM "
@@ -161,16 +181,21 @@ const dbQueries = {
             `
             let result = await transactionUtils.doMultiTransaction(node, deleteQuery)
             console.log("DB Query: Delete from Node 1")
+            syncUtils.syncFragment(2)
+            syncUtils.syncFragment(3)
             return result
         } else if ((year <= 2010 || year == null) && await nodeUtils.pingNode(2)){
             let deleteQuery = baseQuery + "node_2" + tableQuery
             console.log("DB Query: Delete from Node 2")
             let result = await transactionUtils.doTransaction(2, deleteQuery)
+            syncUtils.syncMaster()
             return result
         } else if (year > 2010 && await nodeUtils.pingNode(3)){
             let deleteQuery = baseQuery + "node_3" + tableQuery
             console.log("DB Query: Delete from Node 3")
             let result = await transactionUtils.doTransaction(3, deleteQuery)
+            syncUtils.syncMaster()
+            console.log('Should be here')
             return result
         } else{
             console.log("DB Query: No nodes are available at this moment. Please try again later.")
