@@ -43,7 +43,7 @@ const transactionUtils = {
             }
         } finally{
             if (connection){
-                await connection.release
+                await connection.release()
             }
         }
     },
@@ -122,7 +122,7 @@ const transactionUtils = {
             return result
         } catch(error){
             if (connection){
-                await connection.rollback
+                await connection.rollback()
             }
             throw error
         } finally{

@@ -4,7 +4,7 @@ const transactionUtils = require('./transactions.js');
 
 const syncUtils = {
     syncFragment: async function (nodeNum){
-        console.log("Sync: Fragment")
+        console.log("Sync: Fragment " + nodeNum)
         if (await nodeUtils.pingNode(1) && await nodeUtils.pingNode(nodeNum)){
             let logs = []
             var baseQuery = (`SELECT MAX(log_id) AS idMax FROM log_table`)
@@ -49,7 +49,7 @@ const syncUtils = {
                         WHERE tconst = '${log.tconst}';`
                     bulkQueries += query
                     } else if (log.action == "DELETE"){
-                        const query = `DELETE FROM node_` + nodeNum +  ` WHERE tconst = ${log.tconst};` 
+                        const query = `DELETE FROM node_` + nodeNum +  ` WHERE tconst = '${log.tconst}';` 
                         bulkQueries += query
                     }
                 }
@@ -87,7 +87,7 @@ const syncUtils = {
 
             if (maxMaster3 < maxFrag3){
                 var node3Query = (`SELECT * FROM log_table WHERE log_id > ` + maxMaster3)
-                node3Logs = await transactionUtils.doTransaction(3, node2Query)
+                node3Logs = await transactionUtils.doTransaction(3, node3Query)
             } else if (maxMaster3 > maxFrag3){
                 console.log("Alert: Node 3 needs to be synced")
             }
@@ -127,7 +127,7 @@ const syncUtils = {
                         WHERE tconst = '${log.tconst}';`
                     bulkQueries += query
                 } else if (log.action == "DELETE"){
-                    const query = `DELETE FROM node_1 WHERE tconst = ${log.tconst};` 
+                    const query = `DELETE FROM node_1 WHERE tconst = '${log.tconst}';` 
                     bulkQueries += query
                 }
             }
