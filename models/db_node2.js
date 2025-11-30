@@ -1,11 +1,11 @@
 import {node1, node2, node3, nodeUtils} from './nodes.js'; 
 import transactionUtils from './transactions.js'; 
-import * as dbNode2 from './db_node2.js';
+import * as dbNode1 from './db_node1.js';
 import * as dbNode3 from './db_node3.js';
 
 let isolationLevel = "REPEATABLE READ";
 
-let node1Logs = [];
+let node2Logs = [];
 let numRows = 0;
 
 let syncList = [];
@@ -15,17 +15,17 @@ export async function getNodeInfo() {
     try {
         let connection = await nodeUtils.getConnection(1);
         const [rows] = await connection.query('SELECT * FROM node_1');
-        node1Logs = rows;
+        node2Logs = rows;
     } catch (error) {
         let connection1 = await nodeUtils.getConnection(2);
         let connection2 = await nodeUtils.getConnection(3);
         const [results1] = await connection1.query('SELECT * FROM node_2');
         const [results2] = await connection2.query('SELECT * FROM node_3');
-        node1Logs = [...results1, ...results2];
+        node2Logs = [...results1, ...results2];
     }
-    numRows = node1Logs.length;
+    numRows = node2Logs.length;
     applySyncList();
-    return node1Logs;
+    return node2Logs;
 }
 
 export async function applySyncList() {
@@ -45,8 +45,8 @@ export async function getSyncList() {
 }
 
 export async function checkSerializeable() {
-    let check1 = await dbNode2.getSyncList();
-    let check2 = await dbNode3.getSyncList();
+    let check1 = dbNode1.getSyncList();
+    let check2 = dbNode3.getSyncList();
     if(!check1 && !check2) {
         return true;
     } else {
@@ -55,30 +55,30 @@ export async function checkSerializeable() {
 }
 
 export async function getSingleTitle(data) {
-    const index = node1Logs.findIndex(log => String(log.tconst) === String(data.id));
-    const result = node1Logs[index];
+    const index = node2Logs.findIndex(log => String(log.tconst) === String(data.id));
+    const result = node2Logs[index];
     return result;
 }
 
 export async function selectQuery() {
-    return node1Logs; 
+    return node2Logs; 
 }
 
 export async function updateQuery(data) { 
     if(isolationLevel !== 'SERIALIZABLE' || checkSerializeable()) {
-        if (node1Logs.length === 0) {
-            console.warn("Warning: node1Logs is empty. Did you run getNodeInfo() first?");
+        if (node2Logs.length === 0) {
+            console.warn("Warning: node2Logs is empty. Did you run getNodeInfo() first?");
             return;
         }
 
-        const index = node1Logs.findIndex(log => String(log.tconst) === String(data.tconst));
+        const index = node2Logs.findIndex(log => String(log.tconst) === String(data.tconst));
 
         if (index !== -1) {
-            console.log("Found item to update:", node1Logs[index]);
-            node1Logs[index] = { ...node1Logs[index], ...data }; 
+            console.log("Found item to update:", node2Logs[index]);
+            node2Logs[index] = { ...node2Logs[index], ...data }; 
 
             console.log(`Successfully updated tconst: ${data.tconst}`);
-            console.log("New state:", node1Logs[index]);
+            console.log("New state:", node2Logs[index]);
         } else {
             console.log(`tconst not found: ${data.tconst}`);
         }
@@ -86,8 +86,8 @@ export async function updateQuery(data) {
         syncCount++;
 
         if(isolationLevel == "READ UNCOMMITED") {
-            await dbNode2.updateQuery(data);
-            await dbNode3.updateQuery(data);
+            dbNode1.updateQuery(data);
+            dbNode3.updateQuery(data);
         }
     } else {
         const errorMessage = "Transaction Aborted: Serialization conflict detected.";
@@ -99,7 +99,7 @@ export async function updateQuery(data) {
 
 export async function insertQuery(insertData) {
     if(isolationLevel !== 'SERIALIZABLE' || checkSerializeable()) {
-    node1Logs.push(insertData);
+    node2Logs.push(insertData);
     console.log(`Successfully inserted tconst: ${insertData.tconst}`);
     syncList[syncCount] = {type:"INSERT", data: insertData};
     syncCount++;
@@ -107,8 +107,8 @@ export async function insertQuery(insertData) {
 
     
     if(isolationLevel == "READ UNCOMMITED") {
-        await dbNode2.insertQuery(insertData);
-        await dbNode3.insertQuery(insertData);
+        dbNode1.insertQuery(insertData);
+        dbNode3.insertQuery(insertData);
     }
     } else {
         const errorMessage = "Transaction Aborted: Serialization conflict detected.";
@@ -117,28 +117,48 @@ export async function insertQuery(insertData) {
     }
 }
 
-export async function deleteQuery(tconst, isReplication = false) { 
+export async function deleteQuery(tconst, isReplication = false) {
+    console.log("--- DEBUG START ---");
+    console.log("Searching for ID:", tconst.id);
     
+    // 1. Check if the array is empty
+    console.log("Current Log Count:", node2Logs.length);
+
+    // 2. Peek at the first item to see the structure
+    if(node2Logs.length > 0) {
+        console.log("First Log Item Structure:", JSON.stringify(node2Logs[0]));
+    }
+
+    // Your existing check
+    const index = node2Logs.findIndex(log => {
+        // Log comparison for the first few items to check logic
+        // console.log(`Comparing log.tconst [${log.tconst}] vs target [${tconst.id}]`); 
+        return String(log.tconst) === String(tconst.id)
+    });
+
+    console.log("Found Index:", index);
+    console.log("--- DEBUG END ---");
     if(isolationLevel !== 'SERIALIZABLE' || checkSerializeable()) {
-        const index = node1Logs.findIndex(log => String(log.tconst) === String(tconst.id));
+        const index = node2Logs.findIndex(log => String(log.tconst) === String(tconst.id));
         
         if (index !== -1) {
-            node1Logs.splice(index, 1);
+            node2Logs.splice(index, 1);
             console.log(`Successfully deleted tconst: ${tconst.id}`);
         } else {
             console.log(`tconst not found for deletion: ${tconst.id}`);
+            console.log(node2Logs);
         }
         
-        // Add to sync list regardless
         syncList[syncCount] = {type:"DELETE", data: tconst};
         syncCount++;
 
-        // 2. Only propagate if this is NOT a replication call
-        if(isolationLevel === "READ UNCOMMITTED" && !isReplication) {
+        // 2. Fix Spelling: "READ UNCOMMITED" -> "READ UNCOMMITTED"
+        // 3. Add !isReplication check
+        if(isolationLevel == "READ UNCOMMITTED" && !isReplication) {
             console.log("Broadcasting Dirty Read Delete...");
             // Pass 'true' to prevent infinite loop
-            await dbNode2.deleteQuery(tconst, true); 
-            await dbNode3.deleteQuery(tconst, true); 
+            dbNode1.deleteQuery(tconst, true); 
+            dbNode3.deleteQuery(tconst, true); 
         }
     } else {
         const errorMessage = "Transaction Aborted: Serialization conflict detected.";
@@ -150,8 +170,8 @@ export async function deleteQuery(tconst, isReplication = false) {
 export async function setIsolationLevel(level) {
     if(isolationLevel !== level.isolationLevel) {
         isolationLevel = level.isolationLevel;
-        await dbNode2.setIsolationLevel(level);
-        await dbNode3.setIsolationLevel(level);
+        dbNode1.setIsolationLevel(level);
+        dbNode3.setIsolationLevel(level);
     }
 }
 
@@ -216,8 +236,8 @@ export async function syncData() {
     syncList = [];
     syncCount = 0;
     if(isolationLevel == "READ COMMITED") {
-        await dbNode2.getNodeInfo();
-        await dbNode3.getNodeInfo();
+        dbNode1.getNodeInfo();
+        dbNode3.getNodeInfo();
     }
     getNodeInfo();
 }

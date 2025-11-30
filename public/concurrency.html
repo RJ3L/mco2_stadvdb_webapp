@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="concurrency.css">
-  <script src="script.js"></script>
+  <script src="concurrencyScript.js"></script>
 </head>
 
 <body>
@@ -32,6 +32,7 @@
                         <option value="REPEATABLE READ">Repeatable Read</option>
                         <option value="SERIALIZABLE">Serializable</option>
                     </select>
+                    <button onclick="setIsolation()"> SET LEVEL </button>
                 </div>
 
                 <div style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">

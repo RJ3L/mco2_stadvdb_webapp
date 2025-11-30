@@ -7,6 +7,8 @@ const syncUtils = require("./models/sync.js");
 const { nodeUtils } = require("./models/nodes.js");
 const {demoCaseCrash, demoCaseRecovery} = require("./tests/recovery.js")
 const dbNode1 = require("./models/db_node1.js");
+const dbNode2 = require("./models/db_node2.js");
+const dbNode3 = require("./models/db_node3.js");
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -154,11 +156,76 @@ app.post('/test/recovery', async (req, res) => {
         console.error("[Error] ", error);
         res.status(500).json({ message: 'Test failed: ', error: error.message });
     }
+});
+
+
+app.post('/api/ConcurrencyInsert', async (req, res) => {
+    try {
+        const result = await dbNode1.insertQuery(req.body);
+        res.status(200).json({ message: 'Insert successful', result: result });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Insert failed', error: error.message });
+    }
+});
+
+app.post('/api/ConcurrencyUpdate', async (req, res) => {
+    try {
+        const result = await dbNode1.updateQuery(req.body);
+        res.status(200).json({ message: 'Update successful', result: result });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Update failed', error: error.message });
+    }
+});
+
+app.post('/api/ConcurrencyDelete', async (req, res) => {
+    try {
+        return await dbNode1.deleteQuery(req.body);
+    } catch (error) {
+        console.log(error);
+    }
+});
+
+app.post('/api/ConcurrencyRead', async (req, res) => {
+    try {
+        result = await dbNode1.getSingleTitle(req.body);
+        //console.log("index", result);
+        if (result) {
+             res.status(200).json(result); 
+        } else {
+             res.status(404).json({ message: "Record not found" });
+        }
+    } catch (error) {
+        console.log(error);
+    }
+});
+
+app.post('/api/ConcurrencySync', async (req, res) => {
+    try {
+        const result = await dbNode1.syncData();
+        res.status(200).json({ message: 'Sync Complete', result: result });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Sync failed', error: error.message });
+    }
+});
+
+app.post('/api/ConcurrencyIsolationLevel', async (req, res) => {
+    try {
+        const result1 = await dbNode1.setIsolationLevel(req.body);
+        const result2 = await dbNode2.setIsolationLevel(req.body);
+        const result3 = await dbNode3.setIsolationLevel(req.body);
+        res.status(200).json({ message: 'Isolation Level SET', result: result1 });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Isolation Level NOT SET', error: error.message });
+    }
 })
 
 app.listen(PORT, async () => {
     console.log(`Server listening on port ${PORT}`);
     await dbNode1.getNodeInfo();
-    await dbNode1.insertQuery({tconst: 'fire', titleType: 'short', primaryTitle: 'Updated Title', originalTitle: 'Updated Original Title', isAdult: 0, startYear: 2011, endYear: null, runtimeMinutes: 1, genres: 'Documentary,Short'});
-    await dbNode1.syncData();
+    console.log("read done");
+    //console.log(result + "help");
 });
