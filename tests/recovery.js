@@ -16,7 +16,7 @@ async function demoCaseCrash(sourceNode, targetNode, action, newTitle){
     let targetConn = null
     let logTable = "log_table"
     let flag = 0
-    let errorString = ""
+    let errorString = "Success: "
 
     if (sourceNode == 1){
         logTable += `_${targetNode}`
@@ -75,7 +75,7 @@ async function demoCaseCrash(sourceNode, targetNode, action, newTitle){
         console.log(newTitle.pTitle)
         console.log("       [Fail] The write transaction was successful.")
         flag = 1
-        errorString = "The write transaction in the target node proceeded."
+        errorString = "Fail: The write transaction in the target node proceeded. "
     }
 
     console.log("   [STEP 6] Verify that a log has been created in the source node.")
@@ -84,12 +84,12 @@ async function demoCaseCrash(sourceNode, targetNode, action, newTitle){
     sourceConn.release()
     if (logs.length > 0){
         console.log(`       [Success] A log has been created with the ID of ${logs[0].log_id}.`)
-        return {status: flag, log: logs[0], error: errorString}
+        return {status: flag, log: logs[0], error: errorString + `A log has been created with the ID of ${logs[0].log_id}.`}
     } else {
         console.log("       [Fail] No log has been created.")
         flag += 2
+        return {status: flag, log: null, error: errorString + "No log has been created."}
     }
-    return {status: flag, log: null, error: errorString}
 }
 
 /*
@@ -104,8 +104,6 @@ async function demoCaseRecovery(sourceNode, targetNode, action, newTitle){
     console.log("[Recovery] Case 2 & 4: Target node comes back online and missed some transactions.")
     let sourceConn = await nodeUtils.getConnection(sourceNode)
     let targetConn = null
-    let flag = 0
-    let errorString = ""
     console.log("   [STEP 1] Source node starts a write transaction and commits.")
     await sourceConn.beginTransaction()
     let query = `
@@ -135,7 +133,7 @@ async function demoCaseRecovery(sourceNode, targetNode, action, newTitle){
         console.log("       [Success] The transaction was successful.")
     } else{
         console.log("       [Fail] The transaction failed.")
-        return {status: 1, error: "The write transaction in the source node did not succeed."}
+        return {status: 1, error: "Fail: The write transaction in the source node did not succeed."}
     }
 
     console.log("   [STEP 3] Verify that the target node has not been updated.")
@@ -148,7 +146,7 @@ async function demoCaseRecovery(sourceNode, targetNode, action, newTitle){
         console.log("       [Success] No entry has been inserted in the target node.")
     } else{
         console.log("       [Fail] The target node has been modified.")
-        return {status: 2, error: "The target node has been modified."}
+        return {status: 2, error: "Fail: The target node has been modified before syncing."}
     }
     if (targetNode == 1){
         console.log("   [STEP 4] Call syncMaster to replicate the transaction.")
@@ -164,9 +162,10 @@ async function demoCaseRecovery(sourceNode, targetNode, action, newTitle){
     targetConn.release()
     if (cRows.length > 0 && cRows[0].primaryTitle == newTitle.pTitle){
         console.log("       [Success] The target node has been updated.")
+        return {status: 1, error: "Success: The target node has been updated."}
     } else{
         console.log("       [Fail] The target node has not been synced.")
-        return {status: 3, error: "The target node was not synced with the source node."}
+        return {status: 3, error: "Fail: The target node was not synced with the source node."}
     }
 }
 module.exports = {
