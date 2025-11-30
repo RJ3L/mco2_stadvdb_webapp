@@ -97,7 +97,15 @@
    <section class="database-section">
     <div class="database-row">
         <h3 class="section-label" style="margin-bottom:0; border:none;">Live Database View</h3>
-        <button class="refresh-button" onclick="fetchDatabaseData()">&#x21bb; Refresh Table</button>
+        <div>
+            <button class="refresh-button" style="background-color: #367349; color: white; margin-right: 10px;" onclick="handleSync()">
+                &#x21c4; Sync Nodes
+            </button>
+            
+            <button class="refresh-button" onclick="fetchDatabaseData()">
+                &#x21bb; Refresh Table
+            </button>
+        </div>
     </div>
     
     <!--Reference: https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/table-->

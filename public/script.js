@@ -60,6 +60,37 @@ async function fetchDatabaseData() {
     }
 }
 
+function populateForms(row) {
+    // Fill Insert Form
+    setValue('insert_id', row.tconst);
+    setValue('insert_TitleType', row.titleType);
+    setValue('insert_PrimaryName', row.primaryTitle);
+    setValue('insert_OriginalName', row.originalTitle);
+    setValue('insert_Adult', row.isAdult);
+    setValue('insert_StartYear', row.startYear);
+    setValue('insert_EndYear', row.endYear);
+    setValue('insert_RunTime', row.runtimeMinutes);
+    setValue('insert_Genre', row.genres);
+
+    // Fill Update Form
+    setValue('update_id', row.tconst);
+    setValue('update_titleType', row.titleType);
+    setValue('update_PrimaryName', row.primaryTitle);
+    setValue('update_OriginalName', row.originalTitle);
+    setValue('update_Adult', row.isAdult);
+    setValue('update_StartYear', row.startYear);
+    setValue('update_EndYear', row.endYear);
+    setValue('update_RunTime', row.runtimeMinutes);
+    setValue('update_Genre', row.genres);
+
+    // Fill Delete/Read Form
+    setValue('delete_id', row.tconst);
+    setValue('delete_year', row.startYear);
+    setValue('read_id', row.tconst);
+    
+    console.log("Form populated with:", row.tconst);
+}
+
 async function handleInsert(){
     const data = {
        tconst: getValue('insert_id'),
@@ -73,11 +104,14 @@ async function handleInsert(){
        genres: getValue('insert_Genre'), 
     };
     
+    const { isolationLevel, isDemoMode } = getConcurrencySettings();
+    const payload = { ...data, isolationLevel, isDemoMode };
+
     try {
         const response = await fetch('/api/insert', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
+            body: JSON.stringify(payload),
         });
         const result = await response.json();
         alert("Insert: " + result.message);
@@ -131,11 +165,14 @@ async function handleDelete(){
         year: getValue('delete_year')
     };
 
+    const { isolationLevel, isDemoMode } = getConcurrencySettings();
+    const payload = { ...data, isolationLevel, isDemoMode };
+
     try {
         const response = await fetch('/api/delete', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
+            body: JSON.stringify(payload),
         });
         const result = await response.json();
         alert("Delete: " + result.message);
@@ -187,5 +224,22 @@ async function checkNodeStatus(node){
         console.error(`Error checking status of Node ${node}:`, error);
         element.textContent = `Error checking Node ${node}`;
         element.style.color = 'orange';
+    }
+}
+
+async function handleSync() {
+    console.log("Syncing nodes...");
+    
+    try {
+        const response = await fetch('/api/sync', { method: 'POST' });
+        const result = await response.json();
+        
+        alert("System Message: " + result.message);
+        
+        // Auto-refresh the table to show the synced data
+        fetchDatabaseData(); 
+    } catch (error) {
+        console.error(error);
+        alert("Sync failed. Check console for details.");
     }
 }
