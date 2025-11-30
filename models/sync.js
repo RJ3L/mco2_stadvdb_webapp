@@ -54,7 +54,6 @@ const syncUtils = {
                     }
                 }
                 bulkQueries += "COMMIT;"
-                console.log("Query: "+ bulkQueries)
                 let results = await transactionUtils.doMultiTransaction(nodeNum, bulkQueries);
                 return results
             }
@@ -132,7 +131,6 @@ const syncUtils = {
                 }
             }
             bulkQueries += "COMMIT;"
-            console.log("Query: "+ bulkQueries)
             let results = await transactionUtils.doMultiTransaction(1, bulkQueries);
             return results
         } else{

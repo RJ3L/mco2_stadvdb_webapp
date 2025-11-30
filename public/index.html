@@ -7,6 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <script src="script.js"></script>
+  <script src="recoveryScript.js"></script>
 </head>
 
 <body>
@@ -56,14 +57,14 @@
                     <h3 class="recovery-title">Global Failure Recovery</h3>
                     <hr class="recovery-divider">
                     <div class="recovery-container">
-                        <button class="recovery-button">Run Recovery Test 1</button>
-                        <button class="recovery-button">Run Recovery Test 2</button>
-                        <button class="recovery-button">Run Recovery Test 3</button>
-                        <button class="recovery-button">Run Recovery Test 4</button>
+                        <button class="recovery-button" onclick="openRecoveryModal(1)">Run Recovery Test 1</button>
+                        <button class="recovery-button" onclick="openRecoveryModal(2)">Run Recovery Test 2</button>
+                        <button class="recovery-button" onclick="openRecoveryModal(3)">Run Recovery Test 3</button>
+                        <button class="recovery-button" onclick="openRecoveryModal(4)">Run Recovery Test 4</button>
                     </div>
                 </section>
             </div>
-
+            
             <section class="terminal-frame">
                 <h3 class="terminal-title">Database Management (CRUD Operations)</h3>
                 <div class="crud-box">
@@ -113,5 +114,75 @@
             </section>
         </div>
     </div>
+    <!-- Recovery Modal -->
+    <div id="recoveryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Global Failure Recovery</h4>
+                <span id="testCase" ></span>
+            </div>
+            <div class="modal-body">
+                <form id="recoveryForm">
+                    <div class="form-row">
+                        <label for="rec_transaction">Transaction</label>
+                        <select id="rec_transaction">
+                            <option value="INSERT">INSERT</option>
+                            <option value="UPDATE">UPDATE</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label for="rec_fragment">Fragment</label>
+                        <select id="rec_fragment">
+                            <option value="2">Node 2</option>
+                            <option value="3">Node 3</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label for="rec_titleType">Title Type</label>
+                        <select id="rec_titleType">
+                            <option value="movie">Movie</option>
+                            <option value="short">Short</option>
+                            <option value="series">Series</option>
+                            <option value="episode">TV Episode</option>
+                            <option value="video">Video</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label for="rec_tconst">tConst</label>
+                        <input type="text" id="rec_tconst">
+                    </div>
+                    <div class="form-row">
+                        <label for="rec_primaryTitle">Primary Title</label>
+                        <input type="text" id="rec_primaryTitle" placeholder="e.g. The Thing">
+                    </div>
+                    <div class="form-row">
+                        <label for="rec_originalTitle">Original Title</label>
+                        <input type="text" id="rec_originalTitle" placeholder="e.g. The Thing">
+                    </div>
+                    <div class="form-row form-row-checkbox">
+                        <label for="rec_isAdult">Is Adult?</label>
+                        <input type="checkbox" id="rec_isAdult">
+                    </div>
+                    <div class="form-row">
+                        <label for="rec_startYear">Start Year</label>
+                        <input type="number" id="rec_startYear" placeholder="YYYY">
+                    </div>
+                    <div class="form-row">
+                        <label for="rec_endYear">End Year</label>
+                        <input type="number" id="rec_endYear" placeholder="YYYY">
+                    </div>
+                    <div class="form-row">
+                        <label for="rec_genres">Genres</label>
+                        <input type="text" id="rec_genres" placeholder="Horror,Sci-Fi,Thriller">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn btn-cancel" onclick="closeRecoveryModal()">Cancel</button>
+                <button class="modal-btn btn-submit" id="recoverySubmitBtn">Submit</button>
+            </div>
+        </div>
+    </div>
+    <!-- End of Recovery Modal-->
 </body>
 </html>

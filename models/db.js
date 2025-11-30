@@ -40,7 +40,6 @@ const dbQueries = {
                     return await runSelect(1, `SELECT * FROM node_1 ` + query + ` ` + limit);
                 }
             }
-            
             // Fallback for complex ranges (Simplified for demo stability)
             if (await nodeUtils.pingNode(1)){
                  return await runSelect(1, `SELECT * FROM node_1 ` + query + ` ` + limit);
@@ -121,19 +120,16 @@ const dbQueries = {
             let result = await transactionUtils.doMultiTransaction(1, updateQuery)
             console.log("DB Query: Update to Node 1 (Multi)")
             return result
-
         } else if ((year <= 2010 || year == null) && await nodeUtils.pingNode(2)){
             // Logic for Node 2
             let sql = "UPDATE node_2" + updateClause
             console.log("DB Query: Update to Node 2")
             return await transactionUtils.executeUpdate(2, sql, isolationLevel, isDemoMode);
-
         } else if (year > 2010 && await nodeUtils.pingNode(3)){
             // Logic for Node 3
             let sql = "UPDATE node_3" + updateClause
             console.log("DB Query: Update to Node 3")
             return await transactionUtils.executeUpdate(3, sql, isolationLevel, isDemoMode);
-
         } else{
             console.log("DB Query: No nodes are available at this moment.")
         }  

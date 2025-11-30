@@ -5,6 +5,7 @@ const PORT = process.env.PORT || 3000;
 const db = require("./models/db.js");
 const syncUtils = require("./models/sync.js");
 const { nodeUtils } = require("./models/nodes.js");
+const {demoCaseCrash, demoCaseRecovery} = require("./tests/recovery.js")
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -128,6 +129,31 @@ app.post('/api/sync', async (req, res) => {
         res.status(500).json({ message: 'Sync failed', error: error.message });
     }
 });
+
+app.post('/test/recovery', async (req, res) => {
+    const {testCase, fragNode, action, newTitle} = req.body;
+    if (await nodeUtils.pingNode(1) && await nodeUtils.pingNode(fragNode)){
+        return {status: -1, error: "The nodes are not available."}
+    }
+    try{
+        if (testCase == 1){
+            console.log("[Recovery] Case 1")
+            return await demoCaseCrash(fragNode, 1, action, newTitle)
+        } else if (testCase == 2){
+            console.log("[Recovery] Case 2")
+            return await demoCaseRecovery(fragNode, 1, action, newTitle)
+        } else if (testCase == 3){
+            console.log("[Recovery] Case 3")
+            return await demoCaseCrash(1, fragNode, action, newTitle)
+        } else{
+            console.log("[Recovery] Case 4")
+            return await demoCaseRecovery(1, fragNode, action, newTitle)
+        }
+    } catch (error){
+        console.error("[Error] ", error);
+        res.status(500).json({ message: 'Test failed: ', error: error.message });
+    }
+})
 
 app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);

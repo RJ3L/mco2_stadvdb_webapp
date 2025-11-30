@@ -231,3 +231,124 @@ body {
 .spacer {
     flex-grow: 1;
 }
+
+/* Recovery Modal*/
+.modal {
+    display: none;
+    position: fixed; 
+    z-index: 1000; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    justify-content: center;
+    align-items: center; 
+    background-color: rgba(0,0,0,0.6); 
+    backdrop-filter: blur(2px);
+}
+.modal-content {
+    background-color: #FFFFFF;
+    width: 30%; 
+    height: 70%;
+    padding: 20px;
+    border: 1px solid #4D4D4D;
+    border-radius: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #4D4D4D;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    flex-shrink: 0;
+    flex-direction: column;
+}
+.modal-title {
+    margin: 0;
+    margin-bottom: 5px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #367349;
+}
+.close-btn {
+    color: #4D4D4D;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+.close-btn:hover { color: #367349; }
+.modal-body {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+.form-row {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 12px;
+}
+.form-row label {
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #4D4D4D;
+    font-weight: bold;
+}
+.form-row input[type="text"], .form-row input[type="number"], .form-row select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: #F3F3F3;
+}
+.form-row-checkbox {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+.modal-footer {
+    border-top: 1px solid #4D4D4D;
+    padding-top: 15px;
+    margin-top: 15px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-shrink: 0;
+}
+.modal-btn {
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-family: 'JetBrains Mono';
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.btn-cancel {
+    background: transparent;
+    border: 1px solid #4D4D4D;
+    color: #4D4D4D;
+}
+.btn-submit {
+    background: #367349;
+    border: none;
+    color: #FFFFFF;
+}
+.btn-cancel:hover { background: #f0f0f0; }
+.btn-submit:hover { background: #2a5838; }
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #aaa; }
+#recoveryOutput {
+    margin-top: 15px;
+    font-size: 0.8rem;
+    color: #367349;
+    white-space: pre-wrap;
+}
