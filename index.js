@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 'ccscloud.dlsu.edu.ph';
 const db = require("./models/db.js");
 const syncUtils = require("./models/sync.js");
 const { nodeUtils } = require("./models/nodes.js");
