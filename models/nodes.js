@@ -2,9 +2,9 @@ const mysql = require('mysql2/promise');
 const dotenv = require(`dotenv`).config();
 
 const baseConfig = {
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
+    host: process.env.DB_HOST || 'ccscloud.dlsu.edu.ph',
+    user: process.env.DB_USER || 'root', 
+    password: process.env.DB_PASS || 'g27d94sHTDWRxQ38eSpAtrYE',
     waitForConnections: true,
     multipleStatements: true,
     connectionLimit: 10,
@@ -13,19 +13,19 @@ const baseConfig = {
     queueLimit: 0
 }
 const node1 = mysql.createPool({
-    port: process.env.DB_PORT_01,
+    port: process.env.DB_PORT_01 || 60745,
     database: 'server0_db',
     ...baseConfig
 });
 
 const node2 = mysql.createPool({
-    port: process.env.DB_PORT_02,
+    port: process.env.DB_PORT_02 || 60746,
     database: 'server1_db',
     ...baseConfig
 });
 
 const node3 = mysql.createPool({
-    port: process.env.DB_PORT_03,
+    port: process.env.DB_PORT_03 || 60747,
     database: 'server2_db',
     ...baseConfig
 });
