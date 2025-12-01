@@ -229,4 +229,6 @@ app.post('/api/ConcurrencyIsolationLevel', async (req, res) => {
 
 app.listen(PORT, async () => {
     console.log(`Server listening on port ${PORT}`);
+        await dbNode1.getNodeInfo()
+        console.log("READ")
 });

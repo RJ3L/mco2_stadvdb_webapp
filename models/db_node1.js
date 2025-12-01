@@ -1,7 +1,5 @@
 import {node1, node2, node3, nodeUtils} from './nodes.js'; 
 import transactionUtils from './transactions.js'; 
-import * as dbNode2 from './db_node2.js';
-import * as dbNode3 from './db_node3.js';
 
 let isolationLevel = "REPEATABLE READ";
 
