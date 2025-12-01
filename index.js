@@ -5,11 +5,13 @@ const PORT = process.env.PORT || 3000;
 const db = require("./models/db.js");
 const syncUtils = require("./models/sync.js");
 const { nodeUtils } = require("./models/nodes.js");
-const {demoCaseCrash, demoCaseRecovery} = require("./tests/recovery.js")
+const cors = require('cors');
+const {demoCaseCrash, demoCaseRecovery} = require("./tests/recovery.js");
 const dbNode1 = require("./models/db_node1.js");
 const dbNode2 = require("./models/db_node2.js");
 const dbNode3 = require("./models/db_node3.js");
 
+app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -214,9 +216,7 @@ app.post('/api/ConcurrencySync', async (req, res) => {
 app.post('/api/ConcurrencyIsolationLevel', async (req, res) => {
     try {
         const result1 = await dbNode1.setIsolationLevel(req.body);
-        const result2 = await dbNode2.setIsolationLevel(req.body);
-        const result3 = await dbNode3.setIsolationLevel(req.body);
-        res.status(200).json({ message: 'Isolation Level SET', result: result1 });
+        res.status(200).json({ message: 'Isolation Level Set ' + result1, result: result1 });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Isolation Level NOT SET', error: error.message });
@@ -226,6 +226,5 @@ app.post('/api/ConcurrencyIsolationLevel', async (req, res) => {
 app.listen(PORT, async () => {
     console.log(`Server listening on port ${PORT}`);
     await dbNode1.getNodeInfo();
-    console.log("read done");
     //console.log(result + "help");
 });

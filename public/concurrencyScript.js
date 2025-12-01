@@ -4,6 +4,12 @@ const getValue = (id) => {
     return el ? el.value : '';
 }
 
+const Link = {
+
+    link: 'http://localhost:3001'
+
+}
+
 // NEW: Helper to get Isolation Level and Demo Mode
 const getConcurrencySettings = () => {
     isolationLevel = document.getElementById('isolationLevel');
@@ -59,7 +65,7 @@ async function setIsolation() {
             body: JSON.stringify({isolationLevel: selectedLevel}),
         });
         const result = await response.json();
-        alert("Isolation: " + result.message);
+        alert("Isolation: " + result.message, selectedLevel);
     } catch (error) {
         console.error(error.message);
     }
@@ -84,7 +90,14 @@ async function handleInsert(){
             body: JSON.stringify(data),
         });
         const result = await response.json();
+        const res = await axios.post(`${Link.link}/api/ConcurrencyInsert`, data);
+
+        console.log("Response from Node 1:", res.data);
+
+
         alert("Insert: " + result.message);
+
+
     } catch (error) {
         console.error(error.message);
     }

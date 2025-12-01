@@ -9,6 +9,9 @@ const {demoCaseCrash, demoCaseRecovery} = require("./tests/recovery.js")
 const dbNode1 = require("./models/db_node1.js");
 const dbNode2 = require("./models/db_node2.js");
 const dbNode3 = require("./models/db_node3.js");
+const cors = require('cors');
+
+app.use(cors());
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -227,6 +230,6 @@ app.listen(PORT, async () => {
     console.log(`Server listening on port ${PORT}`);
     let result = await dbNode2.getNodeInfo();
     console.log("read done");
-    console.log(result.length);
+    //console.log(result.length);
     //console.log(result + "help");
 });
