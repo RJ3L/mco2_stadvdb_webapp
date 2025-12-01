@@ -70,7 +70,43 @@ async function setIsolation() {
         console.error(error.message);
     }
 }
+async function fetchDatabaseData() {
+    const tableBody = document.getElementById('database-body');
+    if(!tableBody) return;
 
+    try {
+        const response = await fetch('/api/database');
+        const data = await response.json();
+
+        tableBody.innerHTML = '';
+        const rows = Array.isArray(data) ? data : (data.result || []);
+
+        if (rows.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No records found</td></tr>';
+            return;
+        }
+
+        rows.forEach(row => {
+            if (!row.tconst) return;
+            
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+            <td>${row.tconst}</td> 
+            <td>${row.titleType}</td>
+            <td>${row.primaryTitle}</td>
+            <td>${row.originalTitle}</td>
+            <td>${row.isAdult}</td>
+            <td>${row.startYear}</td>
+            <td>${row.endYear || 'N/A'}</td>
+            <td>${row.runtimeMinutes}</td>
+            <td>${row.genres}</td>
+            `;
+            tableBody.appendChild(tr);
+        });
+    } catch (error) {
+        console.error('Error fetching database data:', error.message);
+    }
+}
 async function handleInsert(){
     const data = {
        tconst: getValue('insert_id'),
