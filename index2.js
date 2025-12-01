@@ -1,14 +1,15 @@
 const express = require('express');
 const path = require('path');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 const db = require("./models/db.js");
 const syncUtils = require("./models/sync.js");
 const { nodeUtils } = require("./models/nodes.js");
 const cors = require('cors');
-const {demoCaseCrash, demoCaseRecovery} = require("./tests/recovery.js")
-const Title = require("./models/title.js")
+const {demoCaseCrash, demoCaseRecovery} = require("./tests/recovery.js");
 const dbNode1 = require("./models/db_node1.js");
+const dbNode2 = require("./models/db_node1.js");
+const dbNode3 = require("./models/db_node3.js");
 
 app.use(cors());
 app.use(express.json());
@@ -135,28 +136,23 @@ app.post('/api/sync', async (req, res) => {
 });
 
 app.post('/test/recovery', async (req, res) => {
-    const {testCase, fragNode, action, data} = req.body;
-    if (!(await nodeUtils.pingNode(1) && await nodeUtils.pingNode(fragNode))){
+    const {testCase, fragNode, action, newTitle} = req.body;
+    if (await nodeUtils.pingNode(1) && await nodeUtils.pingNode(fragNode)){
         return {status: -1, error: "The nodes are not available."}
     }
-    const newTitle = new Title(data.tconst, data.titleType, data.primaryTitle, data.originalTitle, data.isAdult, data.startYear, data.endYear, data.runtimeMinutes, data.genres)
     try{
-        if (testCase == '1'){
+        if (testCase == 1){
             console.log("[Recovery] Case 1")
-            let {result, error} = await demoCaseCrash(parseInt(fragNode), 1, action, newTitle)
-            res.json({status: result, message: error })
-        } else if (testCase == '2'){
+            return await demoCaseCrash(fragNode, 1, action, newTitle)
+        } else if (testCase == 2){
             console.log("[Recovery] Case 2")
-            let {result, error} = await demoCaseRecovery(parseInt(fragNode), 1, action, newTitle)
-            res.json({status: result, message: error })
-        } else if (testCase == '3'){
+            return await demoCaseRecovery(fragNode, 1, action, newTitle)
+        } else if (testCase == 3){
             console.log("[Recovery] Case 3")
-            let {result, error} = await demoCaseCrash(1, parseInt(fragNode), action, newTitle)
-            res.json({status: result, message: error })
+            return await demoCaseCrash(1, fragNode, action, newTitle)
         } else{
             console.log("[Recovery] Case 4")
-            let {result, error} = await demoCaseRecovery(1, parseInt(fragNode), action, newTitle)
-            res.json({status: result, message: error })
+            return await demoCaseRecovery(1, fragNode, action, newTitle)
         }
     } catch (error){
         console.error("[Error] ", error);
@@ -167,7 +163,7 @@ app.post('/test/recovery', async (req, res) => {
 
 app.post('/api/ConcurrencyInsert', async (req, res) => {
     try {
-        const result = await dbNode1.insertQuery(req.body);
+        const result = await dbNode2.insertQuery(req.body);
         res.status(200).json({ message: 'Insert successful', result: result });
     } catch (error) {
         console.log(error);
@@ -177,7 +173,7 @@ app.post('/api/ConcurrencyInsert', async (req, res) => {
 
 app.post('/api/ConcurrencyUpdate', async (req, res) => {
     try {
-        const result = await dbNode1.updateQuery(req.body);
+        const result = await dbNode2.updateQuery(req.body);
         res.status(200).json({ message: 'Update successful', result: result });
     } catch (error) {
         console.log(error);
@@ -187,7 +183,7 @@ app.post('/api/ConcurrencyUpdate', async (req, res) => {
 
 app.post('/api/ConcurrencyDelete', async (req, res) => {
     try {
-        return await dbNode1.deleteQuery(req.body);
+        return await dbNode2.deleteQuery(req.body);
     } catch (error) {
         console.log(error);
     }
@@ -195,7 +191,7 @@ app.post('/api/ConcurrencyDelete', async (req, res) => {
 
 app.post('/api/ConcurrencyRead', async (req, res) => {
     try {
-        result = await dbNode1.getSingleTitle(req.body);
+        result = await dbNode2.getSingleTitle(req.body);
         //console.log("index", result);
         if (result) {
              res.status(200).json(result); 
@@ -209,7 +205,7 @@ app.post('/api/ConcurrencyRead', async (req, res) => {
 
 app.post('/api/ConcurrencySync', async (req, res) => {
     try {
-        const result = await dbNode1.syncData();
+        const result = await dbNode2.syncData();
         res.status(200).json({ message: 'Sync Complete', result: result });
     } catch (error) {
         console.log(error);
@@ -219,14 +215,16 @@ app.post('/api/ConcurrencySync', async (req, res) => {
 
 app.post('/api/ConcurrencyIsolationLevel', async (req, res) => {
     try {
-        const result1 = await dbNode1.setIsolationLevel(req.body);
+        const result1 = await dbNode2.setIsolationLevel(req.body);
         res.status(200).json({ message: 'Isolation Level Set ' + result1, result: result1 });
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: 'Test failed: ' + error.message });
+        res.status(500).json({ message: 'Isolation Level NOT SET', error: error.message });
     }
 })
 
 app.listen(PORT, async () => {
     console.log(`Server listening on port ${PORT}`);
+    await dbNode2.getNodeInfo();
+    //console.log(result + "help");
 });
