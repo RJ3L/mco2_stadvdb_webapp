@@ -1,5 +1,9 @@
 import {node1, node2, node3, nodeUtils} from './nodes.js'; 
 import transactionUtils from './transactions.js'; 
+import * as dbNode2 from './db_node2.js';
+import * as dbNode3 from './db_node3.js';
+
+let isolationLevel = "REPEATABLE READ";
 
 let node1Logs = [];
 let numRows = 0;
@@ -7,18 +11,22 @@ let numRows = 0;
 let syncList = [];
 let syncCount = 0;
 
+let UncommitedLog = [];
+
 
 export async function getNodeInfo() {
     try {
         let connection = await nodeUtils.getConnection(1);
         const [rows] = await connection.query('SELECT * FROM node_1');
         node1Logs = rows;
+        UncommitedLog = [rows];
     } catch (error) {
         let connection1 = await nodeUtils.getConnection(2);
         let connection2 = await nodeUtils.getConnection(3);
         const [results1] = await connection1.query('SELECT * FROM node_2');
         const [results2] = await connection2.query('SELECT * FROM node_3');
         node1Logs = [...results1, ...results2];
+        UncommitedLog = [...results1, ...results2];
     }
     if(syncList.length) {
         applySyncList();
@@ -41,23 +49,44 @@ export async function applySyncList() {
 }
 
 export async function getSingleTitle(data) {
+    if (isolationLevel == "READ COMMITTED") {
+        await getNodeInfo();
+    }
+
+    if (isolationLevel == "READ UNCOMMITTED") {
         console.log("UNCOMMITTED");
+        const index = UncommitedLog.findIndex(log => String(log.tconst) === String(data.id));
+        const result = UncommitedLog[index];
+        return result;
+    } else {
+        console.log("COMMITTED")
         const index = node1Logs.findIndex(log => String(log.tconst) === String(data.id));
         const result = node1Logs[index];
         return result;
-
+    }
 }
 
 
 export async function updateQuery(data, isReplay = false) { 
-        const index = node1Logs.findIndex(log => String(log.tconst) === String(data.tconst));
+    if (syncList.length > 0 && isolationLevel == "SERIALIZABLE") {
+        throw new Error("Required Commit First before starting another transaction");
+    }
+    if (isolationLevel == "READ COMMITTED" && !isReplay) {
+        await getNodeInfo();
+    }
+        if (UncommitedLog.length === 0) {
+            console.warn("Warning: UncommitedLog is empty. Did you run getNodeInfo() first?");
+            return;
+        }
+
+        const index = UncommitedLog.findIndex(log => String(log.tconst) === String(data.tconst));
 
         if (index !== -1) {
-            console.log("Found item to update:", node1Logs[index]);
-            node1Logs[index] = { ...node1Logs[index], ...data }; 
+            console.log("Found item to update:", UncommitedLog[index]);
+            UncommitedLog[index] = { ...UncommitedLog[index], ...data }; 
 
             console.log(`Successfully updated tconst: ${data.tconst}`);
-            console.log("New state:", node1Logs[index]);
+            console.log("New state:", UncommitedLog[index]);
         } else {
             console.log(`tconst not found: ${data.tconst}`);
         }
@@ -69,7 +98,13 @@ export async function updateQuery(data, isReplay = false) {
 }
 
 export async function insertQuery(insertData, isReplay = false) {
-    node1Logs.push(insertData);
+    if (syncList.length > 0 && isolationLevel == "SERIALIZABLE") {
+        throw new Error("Required Commit First before starting another transaction");
+    }
+    if (isolationLevel == "READ COMMITTED" && !isReplay) {
+        await getNodeInfo();
+    }
+    UncommitedLog.push(insertData);
     console.log(`Successfully inserted tconst: ${insertData.tconst}`);
     syncList[syncCount] = {type:"INSERT", data: insertData};
     syncCount++;
@@ -82,10 +117,16 @@ export async function insertQuery(insertData, isReplay = false) {
 }
 
 export async function deleteQuery(tconst, isReplay = false) { 
-    const index = node1Logs.findIndex(log => String(log.tconst) === String(tconst.id));
+    if (syncList.length > 0 && isolationLevel == "SERIALIZABLE") {
+        throw new Error("Required Commit First before starting another transaction");
+    }
+    if (isolationLevel == "READ COMMITTED" && !isReplay) {
+        await getNodeInfo();
+    }
+        const index = UncommitedLog.findIndex(log => String(log.tconst) === String(tconst.id));
         
         if (index !== -1) {
-            node1Logs.splice(index, 1);
+            UncommitedLog.splice(index, 1);
             console.log(`Successfully deleted tconst: ${tconst.id}`);
         } else {
             console.log(`tconst not found for deletion: ${tconst.id}`);
@@ -95,6 +136,11 @@ export async function deleteQuery(tconst, isReplay = false) {
             syncCount++;
         }
 
+}
+
+export async function setIsolationLevel(level) {
+        isolationLevel = level.isolationLevel;
+        return level.isolationLevel;
 }
 
 export async function syncData() {
