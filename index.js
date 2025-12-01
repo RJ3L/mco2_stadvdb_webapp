@@ -228,6 +228,11 @@ app.post('/api/ConcurrencyIsolationLevel', async (req, res) => {
 
 app.listen(PORT, async () => {
     console.log(`Server listening on port ${PORT}`);
-        await dbNode1.getNodeInfo()
-        console.log("READ")
+    console.log("⚠️ DEBUG START ⚠️");
+console.log("The Server is starting...");
+console.log("ENV CHECK - DB_HOST:", process.env.DB_HOST);
+console.log("ENV CHECK - MYSQL_URI:", process.env.MYSQL_URI);
+console.log("⚠️ DEBUG END ⚠️");
+        await dbNode1.getNodeInfo();
+        console.log("READ");
 });
