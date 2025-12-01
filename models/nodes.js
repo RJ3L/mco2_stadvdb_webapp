@@ -1,6 +1,11 @@
 const mysql = require('mysql2/promise');
 const dotenv = require(`dotenv`).config();
 
+console.log("------------------------------------------------");
+console.log("DEBUG: Env Var DB_HOST is:", process.env.DB_HOST);
+console.log("DEBUG: Hardcoded Fallback is: 'ccscloud.dlsu.edu.ph'");
+console.log("------------------------------------------------");
+
 const baseConfig = {
     host: process.env.DB_HOST || 'ccscloud.dlsu.edu.ph',
     user: process.env.DB_USER || 'root', 
