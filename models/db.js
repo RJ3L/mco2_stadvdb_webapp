@@ -101,7 +101,6 @@ const dbQueries = {
             "genres = '" + genres + "' " + 
             "WHERE tconst = '" + tconst + "';";
         
-        // Logic for Node 1 (Master)
         if (node == 1 && await nodeUtils.pingNode(1)){
             const { node2Alive, node3Alive } = await nodeUtils.pingAllNodes();
             
