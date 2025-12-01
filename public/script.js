@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchDatabaseData();
 });
 
-
 async function fetchDatabaseData() {
     const tableBody = document.getElementById('database-body');
     if(!tableBody) return;
