@@ -6,6 +6,7 @@ const db = require("./models/db.js");
 const syncUtils = require("./models/sync.js");
 const { nodeUtils } = require("./models/nodes.js");
 const {demoCaseCrash, demoCaseRecovery} = require("./tests/recovery.js")
+const Title = require("./models/title.js")
 const dbNode1 = require("./models/db_node1.js");
 
 app.use(express.json());
@@ -163,7 +164,4 @@ app.post('/test/recovery', async (req, res) => {
 
 app.listen(PORT, async () => {
     console.log(`Server listening on port ${PORT}`);
-    await dbNode1.getNodeInfo();
-    await dbNode1.insertQuery({tconst: 'fire', titleType: 'short', primaryTitle: 'Updated Title', originalTitle: 'Updated Original Title', isAdult: 0, startYear: 2011, endYear: null, runtimeMinutes: 1, genres: 'Documentary,Short'});
-    await dbNode1.syncData();
 });
