@@ -19,9 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchDatabaseData();
 });
 
-
-
-// Replace your existing fetchDatabaseData function with this fixed version
 async function fetchDatabaseData() {
     const tableBody = document.getElementById('database-body');
     if(!tableBody) return;
