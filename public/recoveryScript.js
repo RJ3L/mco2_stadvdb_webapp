@@ -1,4 +1,3 @@
-const Title = require('../models/title.js')
 function openRecoveryModal(testCase){
     const title = document.getElementById('testCase')
     const modal = document.getElementById('recoveryModal')
@@ -32,18 +31,19 @@ window.onclick = function(event){
 async function submitRecoveryTest(testCase){
     const action = getValue('rec_transaction')
     const fragNode = getValue('rec_fragment')
-    const title = new Title(
-        getValue('rec_tconst'),
-        getValue('rec_titleType'),
-        getValue('rec_primaryTitle'),
-        getValue('rec_originalTitle'),
-        getValue('rec_isAdult'),
-        getValue('rec_startYear'),
-        getValue('rec_endYear'),
-        getValue('rec_runtimeMinutes'),
-        getValue('rec_genres')
-    )
-    const payload = {...testCase, fragNode, action, title}
+    const data = {
+        tconst: getValue('rec_tconst'),
+        titleType: getValue('rec_titleType'),
+        primaryTitle: getValue('rec_primaryTitle'),
+        originalTitle: getValue('rec_originalTitle'),
+        isAdult: getValue('rec_isAdult') ? 1:0,
+        startYear: getValue('rec_startYear'),
+        endYear: getValue('rec_endYear'),
+        runtimeMinutes: getValue('rec_runtimeMinutes'),
+        genres: getValue('rec_genres')
+    }
+
+    const payload = {testCase, fragNode, action, data}
     try {
         const response = await fetch('/test/recovery', {
             method: 'POST',
@@ -51,7 +51,9 @@ async function submitRecoveryTest(testCase){
             body: JSON.stringify(payload)
         });
         const result = await response.json();
-        alert("Insert: " + result.errorString);
+        console.log("hey")
+        alert("[Recovery Result] " + result.message);
+        closeRecoveryModal() 
     } catch (error) {
         console.error(error.message);
     }

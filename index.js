@@ -5,11 +5,9 @@ const PORT = process.env.PORT || 3000;
 const db = require("./models/db.js");
 const syncUtils = require("./models/sync.js");
 const { nodeUtils } = require("./models/nodes.js");
-const cors = require('cors');
-const {demoCaseCrash, demoCaseRecovery} = require("./tests/recovery.js");
+const {demoCaseCrash, demoCaseRecovery} = require("./tests/recovery.js")
+const Title = require("./models/title.js")
 const dbNode1 = require("./models/db_node1.js");
-const dbNode2 = require("./models/db_node2.js");
-const dbNode3 = require("./models/db_node3.js");
 
 app.use(cors());
 app.use(express.json());
@@ -136,23 +134,28 @@ app.post('/api/sync', async (req, res) => {
 });
 
 app.post('/test/recovery', async (req, res) => {
-    const {testCase, fragNode, action, newTitle} = req.body;
-    if (await nodeUtils.pingNode(1) && await nodeUtils.pingNode(fragNode)){
+    const {testCase, fragNode, action, data} = req.body;
+    if (!(await nodeUtils.pingNode(1) && await nodeUtils.pingNode(fragNode))){
         return {status: -1, error: "The nodes are not available."}
     }
+    const newTitle = new Title(data.tconst, data.titleType, data.primaryTitle, data.originalTitle, data.isAdult, data.startYear, data.endYear, data.runtimeMinutes, data.genres)
     try{
-        if (testCase == 1){
+        if (testCase == '1'){
             console.log("[Recovery] Case 1")
-            return await demoCaseCrash(fragNode, 1, action, newTitle)
-        } else if (testCase == 2){
+            let {result, error} = await demoCaseCrash(parseInt(fragNode), 1, action, newTitle)
+            res.json({status: result, message: error })
+        } else if (testCase == '2'){
             console.log("[Recovery] Case 2")
-            return await demoCaseRecovery(fragNode, 1, action, newTitle)
-        } else if (testCase == 3){
+            let {result, error} = await demoCaseRecovery(parseInt(fragNode), 1, action, newTitle)
+            res.json({status: result, message: error })
+        } else if (testCase == '3'){
             console.log("[Recovery] Case 3")
-            return await demoCaseCrash(1, fragNode, action, newTitle)
+            let {result, error} = await demoCaseCrash(1, parseInt(fragNode), action, newTitle)
+            res.json({status: result, message: error })
         } else{
             console.log("[Recovery] Case 4")
-            return await demoCaseRecovery(1, fragNode, action, newTitle)
+            let {result, error} = await demoCaseRecovery(1, parseInt(fragNode), action, newTitle)
+            res.json({status: result, message: error })
         }
     } catch (error){
         console.error("[Error] ", error);

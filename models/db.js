@@ -77,11 +77,15 @@ const dbQueries = {
         } else if ((startYear <= 2010 || startYear == null) && await nodeUtils.pingNode(2)){
             let query = baseQuery + "node_2" + tableQuery + valuesQuery
             console.log("DB Query: Insert to Node 2")
-            return await transactionUtils.executeUpdate(2, query, isolationLevel, isDemoMode);
+            let result = await transactionUtils.executeUpdate(2, query, isolationLevel, isDemoMode);
+            syncUtils.syncMaster()
+            return result
         } else if (startYear > 2010 && await nodeUtils.pingNode(3)){
             let query = baseQuery + "node_3" + tableQuery + valuesQuery
             console.log("DB Query: Insert to Node 3")
-            return await transactionUtils.executeUpdate(3, query, isolationLevel, isDemoMode);
+            let result = await transactionUtils.executeUpdate(3, query, isolationLevel, isDemoMode);
+            syncUtils.syncMaster()
+            return result
         } else{
             console.log("DB Query: No nodes are available at this moment. Please try again later.")
         }
@@ -123,12 +127,16 @@ const dbQueries = {
             // Logic for Node 2
             let sql = "UPDATE node_2" + updateClause
             console.log("DB Query: Update to Node 2")
-            return await transactionUtils.executeUpdate(2, sql, isolationLevel, isDemoMode);
+            let result = await transactionUtils.executeUpdate(2, sql, isolationLevel, isDemoMode);
+            syncUtils.syncMaster()
+            return result
         } else if (year > 2010 && await nodeUtils.pingNode(3)){
             // Logic for Node 3
             let sql = "UPDATE node_3" + updateClause
             console.log("DB Query: Update to Node 3")
-            return await transactionUtils.executeUpdate(3, sql, isolationLevel, isDemoMode);
+            let result = await transactionUtils.executeUpdate(3, sql, isolationLevel, isDemoMode);
+            syncUtils.syncMaster()
+            return result
         } else{
             console.log("DB Query: No nodes are available at this moment.")
         }  
@@ -159,11 +167,15 @@ const dbQueries = {
         } else if ((year <= 2010 || year == null) && await nodeUtils.pingNode(2)){
             let deleteQuery = baseQuery + "node_2" + tableQuery
             console.log("DB Query: Delete from Node 2")
-            return await transactionUtils.executeUpdate(2, deleteQuery, isolationLevel, isDemoMode);
+            let result = await transactionUtils.executeUpdate(2, deleteQuery, isolationLevel, isDemoMode);
+            syncUtils.syncMaster()
+            return result
         } else if (year > 2010 && await nodeUtils.pingNode(3)){
             let deleteQuery = baseQuery + "node_3" + tableQuery
             console.log("DB Query: Delete from Node 3")
-            return await transactionUtils.executeUpdate(3, deleteQuery, isolationLevel, isDemoMode);
+            let result = await transactionUtils.executeUpdate(3, deleteQuery, isolationLevel, isDemoMode);
+            syncUtils.syncMaster()
+            return result
         } else{
             console.log("DB Query: No nodes are available at this moment. Please try again later.")
         }
